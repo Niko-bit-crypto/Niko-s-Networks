@@ -5,7 +5,7 @@ const gamesDir = path.resolve('public/games');
 const outputDir = path.resolve('src/data');
 const outputFile = path.join(outputDir, 'bundledGamesHtml.js');
 
-const gameIds = ['snake', 'tetris', 'pong', 'breakout', '2048', 'flappy', 'runner', 'space-invaders'];
+const gameIds = ['snake', 'tetris', 'pong', 'breakout', '2048', 'flappy', 'runner', 'space-invaders', 'pacman'];
 
 const bundle = {};
 

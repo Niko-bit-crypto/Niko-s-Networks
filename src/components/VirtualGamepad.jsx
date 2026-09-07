@@ -93,6 +93,16 @@ export const VirtualGamepad = ({ game, onSendKey, onRestart }) => {
         subB: 'Play'
       };
     }
+    if (id === 'pacman') {
+      return {
+        aLabel: 'START',
+        aKey: ' ',
+        bLabel: 'COIN',
+        bKey: 'Enter',
+        subA: 'Chomp',
+        subB: 'Enter'
+      };
+    }
     if (id === 'breakout' || id === 'pong') {
       return {
         aLabel: 'SERVE',

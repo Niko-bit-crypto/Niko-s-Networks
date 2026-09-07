@@ -112,5 +112,19 @@ export const DEFAULT_GAMES = [
     plays: 24300,
     rating: 4.92,
     tags: ["Space", "Shooter", "Retro", "Arcade"]
+  },
+  {
+    id: "pacman",
+    title: "Pac-Man Classic",
+    category: "Arcade",
+    description: "The golden age 1980s coin-op legend! Navigate the neon maze, munch energy pellets, outsmart the 4 colorful ghosts, and turn the tables with power energizers.",
+    iframeSrc: "./games/pacman/index.html",
+    srcDoc: BUNDLED_GAMES_HTML["pacman"] || "",
+    iframeCode: "<iframe src=\"./games/pacman/index.html\" title=\"Pac-Man Classic\" width=\"100%\" height=\"100%\" frameborder=\"0\" allowfullscreen loading=\"lazy\"></iframe>",
+    controls: "Arrow keys or W / A / S / D to turn. Swipe on touchscreen.",
+    badge: "Legendary",
+    plays: 58200,
+    rating: 5.0,
+    tags: ["Pacman", "Arcade", "Retro", "Classic", "Maze"]
   }
 ];

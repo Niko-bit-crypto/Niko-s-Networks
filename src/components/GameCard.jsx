@@ -10,6 +10,7 @@ const GAME_ICONS = {
   flappy: '🐥',
   runner: '🦖',
   'space-invaders': '👾',
+  pacman: '🟡',
 };
 
 export const GameCard = ({

@@ -33,6 +33,7 @@ const gamesListMeta = [
   { id: 'flappy', title: 'Flappy Bird', category: 'Arcade', desc: 'Flap through pipes with tight timing.', color: '#ffe600', icon: '🐦' },
   { id: 'runner', title: 'Dino Runner', category: 'Retro', desc: 'Duck and leap past desert obstacles.', color: '#39ff14', icon: '🦖' },
   { id: 'space-invaders', title: 'Space Defenders', category: 'Arcade', desc: 'Blast waves of descending alien invaders.', color: '#ff007f', icon: '👾' },
+  { id: 'pacman', title: 'Pac-Man Classic', category: 'Arcade', desc: 'Chomp energy dots and dodge retro ghosts.', color: '#ffe600', icon: '🟡' },
 ];
 
 const html = `<!DOCTYPE html>
@@ -327,7 +328,7 @@ const html = `<!DOCTYPE html>
         card.className = 'card';
         card.onclick = () => openGame(g.id, g.title);
 
-        const bannerBg = g.id === 'snake' ? '#0d2818' : g.id === 'tetris' ? '#1e1b4b' : g.id === 'pong' ? '#082f49' : g.id === 'breakout' ? '#451a03' : g.id === '2048' ? '#4a044e' : g.id === 'flappy' ? '#365314' : g.id === 'runner' ? '#14532d' : '#3b0764';
+        const bannerBg = g.id === 'snake' ? '#0d2818' : g.id === 'tetris' ? '#1e1b4b' : g.id === 'pong' ? '#082f49' : g.id === 'breakout' ? '#451a03' : g.id === '2048' ? '#4a044e' : g.id === 'flappy' ? '#365314' : g.id === 'runner' ? '#14532d' : g.id === 'pacman' ? '#422006' : '#3b0764';
 
         card.innerHTML = \`
           <div class="card-banner" style="background:\${bannerBg}">
