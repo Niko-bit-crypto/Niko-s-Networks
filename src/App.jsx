@@ -33,7 +33,7 @@ export default function App() {
   useEffect(() => {
     async function loadGames() {
       try {
-        const res = await fetch('/games.json');
+        const res = await fetch('./games.json');
         if (res.ok) {
           const data = await res.json();
           const customSaved = localStorage.getItem('unblocked_custom_games');

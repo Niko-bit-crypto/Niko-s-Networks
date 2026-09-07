@@ -57,8 +57,18 @@ export const GamePlayer = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const resolveSrc = (src) => {
+    if (!src) return '';
+    if (src.startsWith('http://') || src.startsWith('https://')) return src;
+    if (src.startsWith('./')) return src;
+    if (src.startsWith('/')) return '.' + src;
+    return './' + src;
+  };
+
+  const resolvedIframeSrc = resolveSrc(game.iframeSrc);
+
   const handleOpenNewTab = () => {
-    window.open(game.iframeSrc, '_blank', 'noopener,noreferrer');
+    window.open(resolvedIframeSrc, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -135,7 +145,7 @@ export const GamePlayer = ({
         <iframe
           key={iframeKey}
           ref={iframeRef}
-          src={game.iframeSrc}
+          src={resolvedIframeSrc}
           title={game.title}
           className="w-full h-full border-0"
           allow="autoplay; fullscreen; keyboard"

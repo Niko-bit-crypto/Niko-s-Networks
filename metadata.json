@@ -2,5 +2,7 @@
   "name": "Unblocked Games",
   "description": "A fast, lightweight unblocked games portal featuring browser games stored in a JSON configuration and rendered in clean iframes.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
