@@ -28,7 +28,7 @@ export const PanicScreen = ({ onExitPanic }) => {
           id="exit-panic-btn"
           onClick={onExitPanic}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded transition"
-          title="Return to Unblocked Games"
+          title="Return to Niko's Network"
         >
           <Eye className="w-3.5 h-3.5" />
           <span>Resume Session</span>

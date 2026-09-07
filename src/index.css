@@ -1,1 +1,119 @@
 @import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'VT323', monospace;
+    background-color: #07040d;
+    color: #e2e8f0;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom 80's Arcade Font Classes */
+.font-arcade {
+  font-family: 'Press Start 2P', monospace, cursive;
+}
+
+.font-terminal {
+  font-family: 'VT323', monospace;
+}
+
+.font-pixel {
+  font-family: 'Silkscreen', monospace, cursive;
+}
+
+/* 80's Neon Glows */
+.neon-glow-cyan {
+  text-shadow: 0 0 5px #00f0ff, 0 0 12px #00f0ff;
+}
+
+.neon-glow-magenta {
+  text-shadow: 0 0 5px #ff007f, 0 0 12px #ff007f;
+}
+
+.neon-glow-yellow {
+  text-shadow: 0 0 5px #ffe600, 0 0 12px #ffe600;
+}
+
+.neon-glow-green {
+  text-shadow: 0 0 5px #39ff14, 0 0 12px #39ff14;
+}
+
+.neon-box-cyan {
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4), inset 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.neon-box-magenta {
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.4), inset 0 0 10px rgba(255, 0, 127, 0.2);
+}
+
+/* Pixel Hard Drop Shadows (Chunky 80s arcade feel) */
+.pixel-shadow-black {
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.pixel-shadow-magenta {
+  box-shadow: 4px 4px 0px 0px #ff007f;
+}
+
+.pixel-shadow-cyan {
+  box-shadow: 4px 4px 0px 0px #00f0ff;
+}
+
+.pixel-shadow-yellow {
+  box-shadow: 4px 4px 0px 0px #ffe600;
+}
+
+/* CRT Scanlines Screen Overlay */
+.crt-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.35) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.04),
+    rgba(0, 255, 0, 0.02),
+    rgba(0, 0, 255, 0.04)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Arcade Grid Backdrop */
+.arcade-grid-bg {
+  background-color: #07040d;
+  background-image: 
+    linear-gradient(to right, rgba(255, 0, 127, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Blinking Marquee Animation */
+@keyframes arcade-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.15; }
+}
+
+.animate-arcade-blink {
+  animation: arcade-blink 1.1s infinite steps(1);
+}
+
+/* Arcade Push Button Press Effect */
+.arcade-btn {
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+.arcade-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px 0px #000000 !important;
+}
+
+/* Pixel Border Utility */
+.pixel-corners {
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
+}

@@ -43,41 +43,41 @@ export const CloakModal = ({ isOpen, onClose }) => {
   };
 
   const resetCloak = () => {
-    document.title = 'Unblocked Games';
+    document.title = "Niko's Network - 80's Retro Arcade";
     setSelectedPreset(null);
     const link = document.querySelector("link[rel*='icon']");
     if (link) {
-      link.href = '/favicon.ico';
+      link.href = './favicon.ico';
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+      <div className="bg-[#120826] border-4 border-black pixel-shadow-black max-w-md w-full overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-sky-400" />
+        <div className="flex items-center justify-between px-4 py-3 border-b-4 border-black bg-[#1f0e3e]">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#00f0ff] border-2 border-black flex items-center justify-center pixel-shadow-black">
+              <Shield className="w-4 h-4 text-black stroke-[3]" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-100 text-sm">Tab Cloaker</h3>
-              <p className="text-xs text-slate-400">Disguise browser tab title and favicon</p>
+              <h3 className="font-arcade text-xs text-white neon-glow-cyan">TAB CLOAK ENGINE</h3>
+              <p className="font-terminal text-sm text-pink-300">DISGUISE NIKO&apos;S NETWORK</p>
             </div>
           </div>
           <button
             id="close-cloak-modal-btn"
             onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition"
+            className="arcade-btn p-1 bg-red-600 text-white border-2 border-black pixel-shadow-black"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-5 flex flex-col gap-3">
-          <p className="text-xs text-slate-300">
-            Select a disguise preset to change the tab name and favicon instantly:
+        <div className="p-4 flex flex-col gap-3">
+          <p className="font-terminal text-base text-cyan-300">
+            Select a camouflage preset to alter the browser tab title and favicon immediately:
           </p>
 
           <div className="grid grid-cols-1 gap-2">
@@ -88,39 +88,39 @@ export const CloakModal = ({ isOpen, onClose }) => {
                   key={preset.name}
                   id={`preset-${preset.name.toLowerCase().replace(/\s+/g, '-')}`}
                   onClick={() => applyCloak(preset)}
-                  className={`flex items-center justify-between p-3 rounded-lg border text-left transition ${
+                  className={`arcade-btn flex items-center justify-between p-2.5 border-2 text-left transition ${
                     isApplied
-                      ? 'bg-sky-500/10 border-sky-500/50 text-slate-100'
-                      : 'bg-slate-950 border-slate-800 hover:border-slate-700 text-slate-300'
+                      ? 'bg-[#00f0ff] border-black text-black font-bold pixel-shadow-black'
+                      : 'bg-black border-cyan-800 hover:border-cyan-400 text-cyan-200'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Globe className="w-4 h-4 text-sky-400" />
+                    <Globe className="w-4 h-4 text-pink-400" />
                     <div>
-                      <div className="font-semibold text-xs text-slate-200">{preset.name}</div>
-                      <div className="text-[10px] text-slate-500 font-mono">{preset.title}</div>
+                      <div className="font-arcade text-[10px]">{preset.name}</div>
+                      <div className="text-xs font-terminal opacity-80">{preset.title}</div>
                     </div>
                   </div>
-                  {isApplied && <Check className="w-4 h-4 text-sky-400" />}
+                  {isApplied && <Check className="w-4 h-4 text-black stroke-[3]" />}
                 </button>
               );
             })}
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+          <div className="pt-3 border-t-2 border-black flex items-center justify-between">
             <button
               id="reset-cloak-btn"
               onClick={resetCloak}
-              className="text-xs text-slate-400 hover:text-slate-200 underline"
+              className="font-arcade text-[9px] text-pink-400 hover:text-white underline"
             >
-              Reset to Default Tab
+              RESTORE NIKO&apos;S TAB
             </button>
             <button
               id="done-cloak-btn"
               onClick={onClose}
-              className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition"
+              className="arcade-btn px-4 py-1.5 bg-[#ff007f] hover:bg-pink-400 text-white font-arcade text-[10px] font-bold border-2 border-black pixel-shadow-black"
             >
-              Close
+              CLOSE
             </button>
           </div>
         </div>

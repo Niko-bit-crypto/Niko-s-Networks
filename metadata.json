@@ -1,6 +1,6 @@
 {
-  "name": "Unblocked Games",
-  "description": "A fast, lightweight unblocked games portal featuring browser games stored in a JSON configuration and rendered in clean iframes.",
+  "name": "Niko's Network",
+  "description": "An 80's retro arcade-themed unblocked games network featuring pixelated styling, classic CRT vibes, and JSON-configured iframe games.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

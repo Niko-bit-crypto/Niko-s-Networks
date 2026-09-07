@@ -7,16 +7,17 @@ import { JsonViewerModal } from './components/JsonViewerModal.jsx';
 import { CloakModal } from './components/CloakModal.jsx';
 import { PanicScreen } from './components/PanicScreen.jsx';
 import { DEFAULT_GAMES } from './data/defaultGames.js';
-import { Gamepad2, SearchX } from 'lucide-react';
+import { SearchX } from 'lucide-react';
 
 export default function App() {
   const [games, setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [crtEnabled, setCrtEnabled] = useState(true);
   const [favorites, setFavorites] = useState(() => {
     try {
-      const saved = localStorage.getItem('unblocked_favorites');
+      const saved = localStorage.getItem('niko_favorites');
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -36,14 +37,14 @@ export default function App() {
         const res = await fetch('./games.json');
         if (res.ok) {
           const data = await res.json();
-          const customSaved = localStorage.getItem('unblocked_custom_games');
+          const customSaved = localStorage.getItem('niko_custom_games');
           const customGames = customSaved ? JSON.parse(customSaved) : [];
           setGames([...data, ...customGames]);
         } else {
           setGames(DEFAULT_GAMES);
         }
       } catch (err) {
-        console.warn('Could not fetch /games.json, using bundled defaults:', err);
+        console.warn('Could not fetch ./games.json, using bundled defaults:', err);
         setGames(DEFAULT_GAMES);
       }
     }
@@ -65,7 +66,7 @@ export default function App() {
   const handleToggleFavorite = (id) => {
     setFavorites(prev => {
       const next = prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id];
-      localStorage.setItem('unblocked_favorites', JSON.stringify(next));
+      localStorage.setItem('niko_favorites', JSON.stringify(next));
       return next;
     });
   };
@@ -75,14 +76,14 @@ export default function App() {
     setGames(prev => {
       const updated = [newGame, ...prev];
       const customList = updated.filter(g => g.isCustom);
-      localStorage.setItem('unblocked_custom_games', JSON.stringify(customList));
+      localStorage.setItem('niko_custom_games', JSON.stringify(customList));
       return updated;
     });
   };
 
   // Reset defaults
   const handleResetDefaults = () => {
-    localStorage.removeItem('unblocked_custom_games');
+    localStorage.removeItem('niko_custom_games');
     setGames(DEFAULT_GAMES);
     setIsJsonModalOpen(false);
   };
@@ -123,7 +124,12 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen arcade-grid-bg text-slate-100 flex flex-col selection:bg-[#ff007f] selection:text-white relative">
+      {/* Optional Ambient CRT Scanline Overlay across entire page */}
+      {crtEnabled && (
+        <div className="fixed inset-0 crt-overlay z-40 pointer-events-none opacity-40" />
+      )}
+
       {/* Header */}
       <Header
         searchQuery={searchQuery}
@@ -138,6 +144,8 @@ export default function App() {
         onOpenCloakModal={() => setIsCloakModalOpen(true)}
         onTriggerPanic={() => setIsPanicActive(true)}
         favoritesCount={favorites.length}
+        crtEnabled={crtEnabled}
+        onToggleCrt={() => setCrtEnabled(prev => !prev)}
       />
 
       {/* Main Content */}
@@ -150,40 +158,41 @@ export default function App() {
               setHighlightGameForJson(selectedGame);
               setIsJsonModalOpen(true);
             }}
+            crtEnabled={crtEnabled}
           />
         ) : (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-            {/* Top Subheader Banner */}
-            <div className="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800/80 p-5 rounded-2xl border border-slate-800/80">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <Gamepad2 className="w-6 h-6 text-emerald-400" />
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-5">
+            {/* Top 80's Arcade Marquee Banner */}
+            <div className="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-[#140b29] border-4 border-black pixel-shadow-black p-4 sm:p-5 relative overflow-hidden">
+              <div className="flex items-center gap-3 relative z-10">
+                <div className="w-14 h-14 bg-[#00f0ff] border-2 border-black pixel-shadow-black flex items-center justify-center shrink-0">
+                  <span className="text-3xl select-none">🕹️</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-black text-slate-100 tracking-tight flex items-center gap-2">
-                    <span>Unblocked Arcade & Puzzle Hub</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold font-mono">
-                      v1.0
+                  <h1 className="font-arcade text-sm sm:text-base md:text-lg text-white tracking-wider flex items-center gap-2 flex-wrap">
+                    <span className="neon-glow-cyan">NIKO&apos;S NETWORK</span>
+                    <span className="text-[10px] px-2 py-0.5 bg-[#ff007f] text-white border border-black font-bold">
+                      1980s EDITION
                     </span>
                   </h1>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Pure HTML5, CSS & JS games stored as JSON-configured Iframes. Zero blockers, zero ads.
+                  <p className="font-terminal text-base sm:text-lg text-pink-300 mt-0.5 tracking-wide">
+                    Pure HTML5, CSS & JS coin-op classics configured as Iframes in <span className="text-[#39ff14]">games.json</span>.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 self-stretch md:self-auto justify-between md:justify-end">
-                <div className="bg-slate-950/70 border border-slate-800 px-3.5 py-1.5 rounded-xl text-center">
-                  <span className="block text-[10px] text-slate-500 font-mono uppercase tracking-wider">Catalog</span>
-                  <span className="text-sm font-extrabold text-emerald-400">{games.length} Games</span>
+              <div className="flex items-center gap-2 self-stretch md:self-auto justify-between md:justify-end relative z-10 flex-wrap sm:flex-nowrap">
+                <div className="bg-black border-2 border-[#39ff14] px-3 py-1 text-center pixel-shadow-black">
+                  <span className="block text-[9px] text-[#39ff14] font-arcade">ROMS</span>
+                  <span className="font-terminal text-xl font-bold text-white">{games.length} READY</span>
                 </div>
-                <div className="bg-slate-950/70 border border-slate-800 px-3.5 py-1.5 rounded-xl text-center">
-                  <span className="block text-[10px] text-slate-500 font-mono uppercase tracking-wider">Format</span>
-                  <span className="text-sm font-extrabold text-sky-400">JSON Iframes</span>
+                <div className="bg-black border-2 border-[#00f0ff] px-3 py-1 text-center pixel-shadow-black">
+                  <span className="block text-[9px] text-[#00f0ff] font-arcade">FORMAT</span>
+                  <span className="font-terminal text-xl font-bold text-cyan-300">IFRAMES</span>
                 </div>
-                <div className="bg-slate-950/70 border border-slate-800 px-3.5 py-1.5 rounded-xl text-center">
-                  <span className="block text-[10px] text-slate-500 font-mono uppercase tracking-wider">Storage</span>
-                  <span className="text-sm font-extrabold text-amber-400">games.json</span>
+                <div className="bg-black border-2 border-[#ffe600] px-3 py-1 text-center pixel-shadow-black">
+                  <span className="block text-[9px] text-[#ffe600] font-arcade">STATUS</span>
+                  <span className="font-terminal text-xl font-bold text-yellow-300">UNBLOCKED</span>
                 </div>
               </div>
             </div>
@@ -203,15 +212,15 @@ export default function App() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 mb-4">
-                  <SearchX className="w-7 h-7" />
+              <div className="flex flex-col items-center justify-center py-16 text-center bg-[#130b24] border-4 border-black pixel-shadow-black p-6 my-6">
+                <div className="w-14 h-14 bg-black border-2 border-red-500 flex items-center justify-center text-red-500 mb-3 pixel-shadow-black">
+                  <SearchX className="w-8 h-8" />
                 </div>
-                <h3 className="text-base font-bold text-slate-200">No games matched your query</h3>
-                <p className="text-xs text-slate-400 max-w-sm mt-1 mb-4">
+                <h3 className="font-arcade text-sm text-red-400 tracking-wider">GAME OVER: NO MATCH</h3>
+                <p className="font-terminal text-base text-slate-300 max-w-sm mt-2 mb-4">
                   {selectedCategory === 'Favorites'
-                    ? "You haven't added any games to your favorites yet. Click the star on any game card to bookmark it!"
-                    : `No results found for "${searchQuery}". Try searching for another title or clear the filter.`}
+                    ? "You have not saved any retro games to favorites yet. Press the star on any arcade cabinet!"
+                    : `No arcade titles matched "${searchQuery}". Clear query or choose another genre.`}
                 </p>
                 <button
                   id="reset-filters-btn"
@@ -219,9 +228,9 @@ export default function App() {
                     setSearchQuery('');
                     setSelectedCategory('All');
                   }}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition"
+                  className="arcade-btn px-4 py-2 bg-[#ffe600] hover:bg-yellow-300 text-black font-arcade text-xs font-bold border-2 border-black pixel-shadow-black"
                 >
-                  Show All Games
+                  SHOW ALL ROMS
                 </button>
               </div>
             )}
@@ -229,27 +238,31 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950 py-6 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* 80's Arcade Footer */}
+      <footer className="border-t-4 border-black bg-[#0d0718] py-4 text-xs font-terminal text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-400">Unblocked Games</span>
-            <span>•</span>
-            <span>Stored as an Iframe in <code className="text-amber-400 font-mono">games.json</code></span>
+            <span className="font-arcade text-xs text-white neon-glow-magenta">NIKO&apos;S NETWORK</span>
+            <span className="text-[#39ff14]">●</span>
+            <span className="text-pink-300">1980s Retro Arcade Machine</span>
+            <span className="text-[#39ff14]">●</span>
+            <span>Stored in <code className="text-yellow-400">games.json</code></span>
           </div>
-          <div className="flex items-center gap-4 text-[11px]">
+          <div className="flex items-center gap-3 text-sm">
             <button
               id="footer-json-btn"
               onClick={() => {
                 setHighlightGameForJson(null);
                 setIsJsonModalOpen(true);
               }}
-              className="hover:text-slate-300 underline"
+              className="text-cyan-300 hover:text-white underline font-terminal"
             >
-              View JSON Manifest
+              Inspect games.json Manifest
             </button>
             <span>•</span>
-            <span>Hotkeys: Press <kbd className="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700">ESC</kbd> for Panic Cloak</span>
+            <span className="text-green-400">
+              Stealth: Press <kbd className="px-1.5 py-0.5 bg-black text-yellow-300 border border-yellow-400 font-arcade text-[9px]">ESC</kbd> for Panic Cloak
+            </span>
           </div>
         </div>
       </footer>
