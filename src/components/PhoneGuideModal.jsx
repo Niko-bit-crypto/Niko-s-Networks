@@ -31,7 +31,7 @@ export const PhoneGuideModal = ({ isOpen, onClose }) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Niko's Network - 80's Retro Arcade",
+          title: "Niko's Nightclub - 80's Retro Arcade",
           text: "Play unblocked 80s arcade games with touch controls on your phone!",
           url: currentUrl
         });

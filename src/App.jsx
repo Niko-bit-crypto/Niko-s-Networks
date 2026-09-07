@@ -193,7 +193,7 @@ export default function App() {
                 </div>
                 <div>
                   <h1 className="font-arcade text-sm sm:text-base md:text-lg text-white tracking-wider flex items-center gap-2 flex-wrap">
-                    <span className="neon-glow-cyan">NIKO&apos;S NETWORK</span>
+                    <span className="neon-glow-cyan">NIKO&apos;S NIGHTCLUB</span>
                     <span className="text-[10px] px-2 py-0.5 bg-[#ff007f] text-white border border-black font-bold">
                       1980s EDITION
                     </span>
@@ -265,7 +265,7 @@ export default function App() {
       <footer className="border-t-4 border-black bg-[#0d0718] py-4 text-xs font-terminal text-slate-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-arcade text-xs text-white neon-glow-magenta">NIKO&apos;S NETWORK</span>
+            <span className="font-arcade text-xs text-white neon-glow-magenta">NIKO&apos;S NIGHTCLUB</span>
             <span className="text-[#39ff14]">●</span>
             <span className="text-pink-300">1980s Retro Arcade Machine</span>
             <span className="text-[#39ff14]">●</span>

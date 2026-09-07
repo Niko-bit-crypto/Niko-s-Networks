@@ -43,7 +43,7 @@ export const CloakModal = ({ isOpen, onClose }) => {
   };
 
   const resetCloak = () => {
-    document.title = "Niko's Network - 80's Retro Arcade";
+    document.title = "Niko's Nightclub - 80's Retro Arcade";
     setSelectedPreset(null);
     const link = document.querySelector("link[rel*='icon']");
     if (link) {
@@ -62,7 +62,7 @@ export const CloakModal = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h3 className="font-arcade text-xs text-white neon-glow-cyan">TAB CLOAK ENGINE</h3>
-              <p className="font-terminal text-sm text-pink-300">DISGUISE NIKO&apos;S NETWORK</p>
+              <p className="font-terminal text-sm text-pink-300">DISGUISE NIKO&apos;S NIGHTCLUB</p>
             </div>
           </div>
           <button

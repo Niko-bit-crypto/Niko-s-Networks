@@ -68,7 +68,7 @@ export const Header = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-arcade text-base sm:text-lg tracking-wider text-white neon-glow-magenta group-hover:neon-glow-cyan transition-all">
-                  NIKO&apos;S <span className="text-[#00f0ff]">NETWORK</span>
+                  NIKO&apos;S <span className="text-[#00f0ff]">NIGHTCLUB</span>
                 </span>
                 <span className="hidden sm:inline-block px-1.5 py-0.5 bg-yellow-400 text-black font-arcade text-[9px] border border-black font-bold">
                   80s ARCADE

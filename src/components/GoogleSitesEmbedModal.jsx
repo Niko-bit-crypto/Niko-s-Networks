@@ -247,9 +247,9 @@ export const GoogleSitesEmbedModal = ({ isOpen, onClose }) => {
                 </div>
                 <ol className="list-decimal list-inside space-y-2 text-slate-300">
                   <li>Go to <a href="https://vercel.com/new" target="_blank" rel="noreferrer" className="text-yellow-300 underline font-bold">vercel.com/new</a> and click <strong>&quot;Continue with GitHub&quot;</strong>.</li>
-                  <li>Select your <strong className="text-white">nikos-network</strong> repository and click <strong>Import</strong>.</li>
+                  <li>Select your <strong className="text-white">nikos-nightclub</strong> repository and click <strong>Import</strong>.</li>
                   <li>Leave everything as default and click the blue <strong>Deploy</strong> button.</li>
-                  <li>In 30 seconds, Vercel gives you a live link like <code className="text-green-400">https://nikos-network.vercel.app</code>.</li>
+                  <li>In 30 seconds, Vercel gives you a live link like <code className="text-green-400">https://nikos-nightclub.vercel.app</code>.</li>
                   <li>You can open that link directly, or embed it into Google Sites using <strong>Embed &rarr; By URL</strong>!</li>
                 </ol>
               </div>

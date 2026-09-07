@@ -196,7 +196,7 @@ export const GamePlayer = ({
         <div className="flex items-center justify-between pb-2 text-[10px] font-arcade text-pink-400 px-1 border-b-2 border-black mb-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
-            <span className="text-white neon-glow-cyan font-bold">NIKO&apos;S NETWORK CABINET #084</span>
+            <span className="text-white neon-glow-cyan font-bold">NIKO&apos;S NIGHTCLUB CABINET #084</span>
           </div>
           <div className="text-yellow-300 text-[9px] sm:text-[10px]">
             ★ TOUCH OR USE D-PAD BELOW ★

@@ -39,7 +39,7 @@ export class ErrorBoundary extends React.Component {
               ARCADE HARDWARE GLITCH
             </h1>
             <p className="font-terminal text-lg text-slate-300 mb-4">
-              Niko&apos;s Network encountered an unexpected glitch. Don&apos;t worry, no high scores were harmed!
+              Niko&apos;s Nightclub encountered an unexpected glitch. Don&apos;t worry, no high scores were harmed!
             </p>
 
             <div className="bg-black border border-red-500/50 p-3 mb-6 text-left overflow-x-auto">

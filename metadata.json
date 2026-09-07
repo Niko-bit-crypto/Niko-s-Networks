@@ -1,6 +1,6 @@
 {
-  "name": "Niko's Network",
-  "description": "An 80's retro arcade-themed unblocked games network featuring pixelated styling, classic CRT vibes, and JSON-configured iframe games.",
+  "name": "Niko's Nightclub",
+  "description": "An 80's retro arcade & nightclub-themed unblocked games hub featuring pixelated styling, classic CRT vibes, and JSON-configured iframe games.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

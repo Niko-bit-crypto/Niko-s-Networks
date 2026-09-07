@@ -81,7 +81,7 @@ export const AddGameModal = ({
             </div>
             <div>
               <h3 className="font-arcade text-xs text-white neon-glow-green">INSTALL NEW ROM</h3>
-              <p className="font-terminal text-sm text-pink-300">ADD IFRAME TO NIKO&apos;S NETWORK</p>
+              <p className="font-terminal text-sm text-pink-300">ADD IFRAME TO NIKO&apos;S NIGHTCLUB</p>
             </div>
           </div>
           <button
@@ -210,7 +210,7 @@ export const AddGameModal = ({
               id="submit-add-btn"
               className="arcade-btn px-4 py-2 font-arcade text-[10px] bg-[#39ff14] hover:bg-green-400 text-black font-bold border-2 border-black pixel-shadow-black"
             >
-              SAVE TO NIKO&apos;S NETWORK
+              SAVE TO NIKO&apos;S NIGHTCLUB
             </button>
           </div>
         </form>
