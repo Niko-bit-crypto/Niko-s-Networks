@@ -206,6 +206,24 @@ canvas.addEventListener('mousemove', e => {
   p1.y = mouseY - PADDLE_HEIGHT / 2;
 });
 
+// Touch tracking for mobile
+const handleTouchPong = (e) => {
+  if (e.touches.length > 0) {
+    if (!isPlaying) {
+      startGame();
+      return;
+    }
+    const rect = canvas.getBoundingClientRect();
+    const scaleY = canvas.height / rect.height;
+    const touchY = (e.touches[0].clientY - rect.top) * scaleY;
+    p1.y = touchY - PADDLE_HEIGHT / 2;
+  }
+  e.preventDefault();
+};
+
+canvas.addEventListener('touchstart', handleTouchPong, { passive: false });
+canvas.addEventListener('touchmove', handleTouchPong, { passive: false });
+
 window.addEventListener('keydown', e => {
   keys[e.key] = true;
   if (!isPlaying && (e.key === ' ' || e.key === 'Enter')) {
@@ -215,6 +233,18 @@ window.addEventListener('keydown', e => {
 
 window.addEventListener('keyup', e => {
   keys[e.key] = false;
+});
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    const key = e.data.key;
+    const isDown = e.data.action === 'keydown';
+    keys[key] = isDown;
+    if (isDown && !isPlaying && (key === ' ' || key === 'Enter' || key === 'Start')) {
+      startGame();
+    }
+  }
 });
 
 modeBtn.addEventListener('click', () => {

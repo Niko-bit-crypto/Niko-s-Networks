@@ -251,5 +251,58 @@ window.addEventListener('keyup', e => {
   }
 });
 
+// Mobile touch controls: tap to jump, swipe down to duck
+let runnerTouchY = 0;
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length > 0) {
+    runnerTouchY = e.touches[0].clientY;
+  }
+  if (!isPlaying) {
+    startGame();
+    return;
+  }
+  jump();
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  if (!isPlaying) return;
+  if (e.touches.length > 0) {
+    const dy = e.touches[0].clientY - runnerTouchY;
+    if (dy > 30) {
+      duck(true);
+    }
+  }
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  duck(false);
+  e.preventDefault();
+}, { passive: false });
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    const key = e.data.key;
+    const isDown = e.data.action === 'keydown';
+    if (isDown) {
+      if (!isPlaying && (key === ' ' || key === 'Enter' || key === 'Start')) {
+        startGame();
+        return;
+      }
+      if (key === ' ' || key === 'ArrowUp' || key === 'w' || key === 'W' || key === 'Jump') {
+        jump();
+      } else if (key === 'ArrowDown' || key === 's' || key === 'S' || key === 'Duck') {
+        duck(true);
+      }
+    } else {
+      if (key === 'ArrowDown' || key === 's' || key === 'S' || key === 'Duck') {
+        duck(false);
+      }
+    }
+  }
+});
+
 startBtn.addEventListener('click', startGame);
 draw();

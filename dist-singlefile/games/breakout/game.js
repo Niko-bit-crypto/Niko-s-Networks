@@ -225,6 +225,35 @@ canvas.addEventListener('mousemove', e => {
   paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, mouseX - paddle.width / 2));
 });
 
+// Mobile touch tracking
+const handleTouchBreakout = e => {
+  if (e.touches.length > 0) {
+    if (!isPlaying) {
+      startGame();
+      return;
+    }
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+    paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, touchX - paddle.width / 2));
+  }
+  e.preventDefault();
+};
+
+canvas.addEventListener('touchstart', handleTouchBreakout, { passive: false });
+canvas.addEventListener('touchmove', handleTouchBreakout, { passive: false });
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    const key = e.data.key;
+    const isDown = e.data.action === 'keydown';
+    if (key === 'ArrowRight' || key === 'd' || key === 'D') rightPressed = isDown;
+    if (key === 'ArrowLeft' || key === 'a' || key === 'A') leftPressed = isDown;
+    if (isDown && !isPlaying && (key === ' ' || key === 'Enter' || key === 'Start')) startGame();
+  }
+});
+
 startBtn.addEventListener('click', startGame);
 initBricks();
 draw();

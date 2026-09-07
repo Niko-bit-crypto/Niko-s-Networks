@@ -277,6 +277,47 @@ window.addEventListener('keyup', e => {
   keys[e.key] = false;
 });
 
+// Touch control for Space Invaders: touch left side to move left, right side to move right, tap to shoot
+canvas.addEventListener('touchstart', e => {
+  if (!isPlaying) {
+    startGame();
+    return;
+  }
+  if (e.touches.length > 0) {
+    const rect = canvas.getBoundingClientRect();
+    const touchX = e.touches[0].clientX - rect.left;
+    if (touchX < rect.width * 0.4) {
+      keys['ArrowLeft'] = true;
+      keys['ArrowRight'] = false;
+    } else if (touchX > rect.width * 0.6) {
+      keys['ArrowRight'] = true;
+      keys['ArrowLeft'] = false;
+    } else {
+      keys[' '] = true;
+    }
+  }
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  keys['ArrowLeft'] = false;
+  keys['ArrowRight'] = false;
+  keys[' '] = false;
+  e.preventDefault();
+}, { passive: false });
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    const key = e.data.key;
+    const isDown = e.data.action === 'keydown';
+    keys[key] = isDown;
+    if (isDown && !isPlaying && (key === ' ' || key === 'Enter' || key === 'Start')) {
+      startGame();
+    }
+  }
+});
+
 startBtn.addEventListener('click', startGame);
 initStars();
 draw();

@@ -230,5 +230,20 @@ canvas.addEventListener('mousedown', e => {
   flap();
 });
 
+// Mobile touch tap
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  flap();
+}, { passive: false });
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    if (e.data.action === 'keydown') {
+      flap();
+    }
+  }
+});
+
 startBtn.addEventListener('click', startGame);
 draw();
