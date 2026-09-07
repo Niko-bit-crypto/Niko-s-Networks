@@ -5,6 +5,7 @@ import { GamePlayer } from './components/GamePlayer.jsx';
 import { AddGameModal } from './components/AddGameModal.jsx';
 import { JsonViewerModal } from './components/JsonViewerModal.jsx';
 import { CloakModal } from './components/CloakModal.jsx';
+import { GoogleSitesEmbedModal } from './components/GoogleSitesEmbedModal.jsx';
 import { PanicScreen } from './components/PanicScreen.jsx';
 import { DEFAULT_GAMES } from './data/defaultGames.js';
 import { SearchX } from 'lucide-react';
@@ -36,6 +37,7 @@ export default function App() {
   const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
   const [highlightGameForJson, setHighlightGameForJson] = useState(null);
   const [isCloakModalOpen, setIsCloakModalOpen] = useState(false);
+  const [isGoogleSitesModalOpen, setIsGoogleSitesModalOpen] = useState(false);
   const [isPanicActive, setIsPanicActive] = useState(false);
 
   // Load games from games.json or fallback
@@ -62,10 +64,11 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        if (isAddModalOpen || isJsonModalOpen || isCloakModalOpen) {
+        if (isAddModalOpen || isJsonModalOpen || isCloakModalOpen || isGoogleSitesModalOpen) {
           setIsAddModalOpen(false);
           setIsJsonModalOpen(false);
           setIsCloakModalOpen(false);
+          setIsGoogleSitesModalOpen(false);
           return;
         }
         setIsPanicActive(prev => !prev);
@@ -73,7 +76,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAddModalOpen, isJsonModalOpen, isCloakModalOpen]);
+  }, [isAddModalOpen, isJsonModalOpen, isCloakModalOpen, isGoogleSitesModalOpen]);
 
   // Save favorites to localStorage
   const handleToggleFavorite = (id) => {
@@ -157,6 +160,7 @@ export default function App() {
           setIsJsonModalOpen(true);
         }}
         onOpenCloakModal={() => setIsCloakModalOpen(true)}
+        onOpenGoogleSitesModal={() => setIsGoogleSitesModalOpen(true)}
         onTriggerPanic={() => setIsPanicActive(true)}
         favoritesCount={favorites.length}
         crtEnabled={crtEnabled}
@@ -303,6 +307,11 @@ export default function App() {
       <CloakModal
         isOpen={isCloakModalOpen}
         onClose={() => setIsCloakModalOpen(false)}
+      />
+
+      <GoogleSitesEmbedModal
+        isOpen={isGoogleSitesModalOpen}
+        onClose={() => setIsGoogleSitesModalOpen(false)}
       />
     </div>
   );

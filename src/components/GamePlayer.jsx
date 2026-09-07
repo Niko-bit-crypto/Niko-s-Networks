@@ -159,11 +159,12 @@ export const GamePlayer = ({
             isFullscreen ? 'h-screen w-screen border-none p-0' : 'h-[580px]'
           }`}
         >
-          {/* Iframe */}
+          {/* Iframe with offline in-memory srcDoc fallback */}
           <iframe
             key={iframeKey}
             ref={iframeRef}
-            src={resolvedIframeSrc}
+            src={game.srcDoc ? undefined : resolvedIframeSrc}
+            srcDoc={game.srcDoc || undefined}
             title={game.title}
             className="w-full h-full border-0 bg-black"
             allow="autoplay; fullscreen; keyboard"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Terminal, Shield, EyeOff, Sparkles, Tv } from 'lucide-react';
+import { Search, Plus, Terminal, Shield, EyeOff, Sparkles, Tv, ShieldCheck } from 'lucide-react';
 
 const CATEGORIES = [
   { label: 'All', color: 'border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(0,240,255,0.4)]', bgActive: 'bg-cyan-500 text-black shadow-[3px_3px_0px_#000]' },
@@ -18,6 +18,7 @@ export const Header = ({
   onOpenAddModal,
   onOpenJsonModal,
   onOpenCloakModal,
+  onOpenGoogleSitesModal,
   onTriggerPanic,
   favoritesCount,
   crtEnabled,
@@ -141,6 +142,17 @@ export const Header = ({
             >
               <Terminal className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">JSON</span>
+            </button>
+
+            {/* Google Sites Anti-Block Embed Code Button */}
+            <button
+              id="google-sites-embed-btn"
+              onClick={onOpenGoogleSitesModal}
+              title="Get 100% Unblocked Google Sites Embed Code"
+              className="arcade-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-arcade bg-[#39ff14] hover:bg-green-400 text-black font-bold border-2 border-black pixel-shadow-black"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span className="hidden sm:inline">G-SITES</span>
             </button>
 
             {/* Add Game */}

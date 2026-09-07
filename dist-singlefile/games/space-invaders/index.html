@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Defenders</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="space-container">
+    <div class="hud">
+      <div>SCORE: <span id="score">0</span></div>
+      <div>LIVES: <span id="lives">&hearts; &hearts; &hearts;</span></div>
+      <div>WAVE: <span id="wave">1</span></div>
+    </div>
+    <div class="canvas-wrapper">
+      <canvas id="spaceCanvas" width="480" height="420"></canvas>
+      <div id="overlay" class="overlay">
+        <h2>SPACE DEFENDER</h2>
+        <p>Defend the galaxy against invaders!</p>
+        <button id="startBtn">Launch</button>
+      </div>
+    </div>
+    <div class="hint"><span>&larr;</span> <span>&rarr;</span> / <span>A</span> <span>D</span> to Move | <span>SPACE</span> to Shoot</div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
