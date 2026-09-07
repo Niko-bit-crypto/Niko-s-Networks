@@ -13,14 +13,15 @@ const GAME_ICONS = {
 };
 
 export const GameCard = ({
-  game,
-  isFavorite,
+  game = {},
+  isFavorite = false,
   onToggleFavorite,
   onSelectGame,
   onViewIframeCode,
 }) => {
+  const category = game.category || 'Arcade';
   const getBadgeColor = (cat) => {
-    switch (cat.toLowerCase()) {
+    switch ((cat || '').toLowerCase()) {
       case 'arcade':
         return 'bg-pink-600 text-white border-black';
       case 'puzzle':
@@ -35,10 +36,12 @@ export const GameCard = ({
   };
 
   const gameIcon = GAME_ICONS[game.id] || '🕹️';
+  const playsCount = typeof game.plays === 'number' ? game.plays.toLocaleString() : (game.plays || '1,250');
+  const ratingVal = typeof game.rating === 'number' ? game.rating.toFixed(1) : (game.rating || '4.9');
 
   return (
     <div
-      id={`game-card-${game.id}`}
+      id={`game-card-${game.id || 'unknown'}`}
       className="group relative flex flex-col bg-[#120b22] border-4 border-black pixel-shadow-black hover:border-[#ff007f] hover:pixel-shadow-magenta transition-all duration-150"
     >
       {/* Arcade Cabinet Top Marquee Screen */}
@@ -52,8 +55,8 @@ export const GameCard = ({
 
         {/* Top Badges & Status */}
         <div className="relative z-10 flex items-center justify-between">
-          <span className={`px-2 py-0.5 text-[9px] font-arcade uppercase border-2 shadow-[2px_2px_0px_#000] font-bold ${getBadgeColor(game.category)}`}>
-            {game.category}
+          <span className={`px-2 py-0.5 text-[9px] font-arcade uppercase border-2 shadow-[2px_2px_0px_#000] font-bold ${getBadgeColor(category)}`}>
+            {category}
           </span>
           {game.badge && (
             <span className="px-2 py-0.5 text-[9px] font-arcade uppercase bg-yellow-400 text-black border-2 border-black font-bold shadow-[2px_2px_0px_#000] flex items-center gap-1">
@@ -79,11 +82,11 @@ export const GameCard = ({
         <div className="relative z-10 flex items-center justify-between text-[11px] font-terminal text-pink-300">
           <div className="flex items-center gap-1 bg-black/60 px-1.5 py-0.5 border border-pink-500/30">
             <span>PLAYS:</span>
-            <span className="text-white font-bold">{game.plays.toLocaleString()}</span>
+            <span className="text-white font-bold">{playsCount}</span>
           </div>
           <div className="flex items-center gap-1 bg-black/60 px-1.5 py-0.5 border border-yellow-500/30 text-yellow-300">
             <span>★</span>
-            <span className="font-bold">{game.rating.toFixed(1)}</span>
+            <span className="font-bold">{ratingVal}</span>
           </div>
         </div>
       </div>

@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Eye, FileText, CheckCircle2 } from 'lucide-react';
 
 export const PanicScreen = ({ onExitPanic }) => {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' || (e.key === '`' && e.ctrlKey)) {
+        onExitPanic();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onExitPanic]);
+
   return (
     <div className="fixed inset-0 z-50 bg-white text-slate-800 flex flex-col font-sans overflow-auto">
       {/* Mock Docs Header */}

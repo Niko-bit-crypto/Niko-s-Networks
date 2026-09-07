@@ -10,7 +10,15 @@ import { DEFAULT_GAMES } from './data/defaultGames.js';
 import { SearchX } from 'lucide-react';
 
 export default function App() {
-  const [games, setGames] = useState([]);
+  const [games, setGames] = useState(() => {
+    try {
+      const customSaved = localStorage.getItem('niko_custom_games');
+      const customGames = customSaved ? JSON.parse(customSaved) : [];
+      return [...DEFAULT_GAMES, ...customGames];
+    } catch {
+      return DEFAULT_GAMES;
+    }
+  });
   const [selectedGame, setSelectedGame] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -37,30 +45,35 @@ export default function App() {
         const res = await fetch('./games.json');
         if (res.ok) {
           const data = await res.json();
-          const customSaved = localStorage.getItem('niko_custom_games');
-          const customGames = customSaved ? JSON.parse(customSaved) : [];
-          setGames([...data, ...customGames]);
-        } else {
-          setGames(DEFAULT_GAMES);
+          if (Array.isArray(data) && data.length > 0) {
+            const customSaved = localStorage.getItem('niko_custom_games');
+            const customGames = customSaved ? JSON.parse(customSaved) : [];
+            setGames([...data, ...customGames]);
+          }
         }
       } catch (err) {
         console.warn('Could not fetch ./games.json, using bundled defaults:', err);
-        setGames(DEFAULT_GAMES);
       }
     }
     loadGames();
   }, []);
 
-  // Listen for ESC key for instant Panic Mode
+  // Listen for ESC key for instant Panic Mode or closing modals
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        if (isAddModalOpen || isJsonModalOpen || isCloakModalOpen) {
+          setIsAddModalOpen(false);
+          setIsJsonModalOpen(false);
+          setIsCloakModalOpen(false);
+          return;
+        }
         setIsPanicActive(prev => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isAddModalOpen, isJsonModalOpen, isCloakModalOpen]);
 
   // Save favorites to localStorage
   const handleToggleFavorite = (id) => {
@@ -96,21 +109,23 @@ export default function App() {
 
   // Filter games
   const filteredGames = useMemo(() => {
-    return games.filter(game => {
+    const list = Array.isArray(games) && games.length > 0 ? games : DEFAULT_GAMES;
+    return list.filter(game => {
+      if (!game) return false;
       // Category filter
       if (selectedCategory === 'Favorites') {
         if (!favorites.includes(game.id)) return false;
       } else if (selectedCategory !== 'All') {
-        if (game.category.toLowerCase() !== selectedCategory.toLowerCase()) return false;
+        if ((game.category || '').toLowerCase() !== selectedCategory.toLowerCase()) return false;
       }
 
       // Search filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchesTitle = game.title.toLowerCase().includes(q);
-        const matchesDesc = game.description.toLowerCase().includes(q);
-        const matchesCat = game.category.toLowerCase().includes(q);
-        const matchesTags = (game.tags || []).some(t => t.toLowerCase().includes(q));
+        const matchesTitle = (game.title || '').toLowerCase().includes(q);
+        const matchesDesc = (game.description || '').toLowerCase().includes(q);
+        const matchesCat = (game.category || '').toLowerCase().includes(q);
+        const matchesTags = Array.isArray(game.tags) && game.tags.some(t => (t || '').toLowerCase().includes(q));
         if (!matchesTitle && !matchesDesc && !matchesCat && !matchesTags) return false;
       }
 
