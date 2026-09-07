@@ -22,10 +22,10 @@ export const GoogleSitesEmbedModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen && !embedCode) {
       setLoading(true);
-      fetch('./embed.html')
+      fetch('./google-sites-embed.html')
         .then(res => {
           if (res.ok) return res.text();
-          throw new Error('Could not fetch ./embed.html');
+          return fetch('./embed.html').then(r => r.text());
         })
         .then(text => {
           setEmbedCode(text);

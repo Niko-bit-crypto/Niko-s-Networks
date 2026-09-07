@@ -22,6 +22,9 @@ if (fs.existsSync(singleFileSrc)) {
 
   fs.writeFileSync(publicDest, html, 'utf8');
   console.log('3. Successfully converted and copied singlefile bundle to public/embed.html (classic script mode)!');
+
+  console.log('4. Building ultra-lightweight Google Sites standalone embed...');
+  execSync('node scripts/buildGoogleSitesStandalone.js', { stdio: 'inherit' });
 } else {
   console.error('Error: dist-singlefile/index.html was not generated.');
   process.exit(1);
