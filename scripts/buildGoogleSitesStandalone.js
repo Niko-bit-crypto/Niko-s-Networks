@@ -548,6 +548,13 @@ const html = `<!DOCTYPE html>
       });
     }
 
+    // Safe Escape key handler: closes active game back to arcade catalog
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && activeGameId) {
+        closeGame();
+      }
+    });
+
     renderGames();
   </script>
 </body>

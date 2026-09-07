@@ -181,11 +181,11 @@ export const Header = ({
             <button
               id="panic-btn"
               onClick={onTriggerPanic}
-              title="Emergency stealth exit (ESC key)"
+              title="Emergency stealth camouflage (Alt+P or Click)"
               className="arcade-btn inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-arcade bg-red-600 hover:bg-red-500 text-white font-bold border-2 border-black pixel-shadow-black animate-pulse"
             >
               <EyeOff className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline">PANIC! [ESC]</span>
+              <span className="hidden lg:inline">PANIC!</span>
             </button>
           </div>
         </div>

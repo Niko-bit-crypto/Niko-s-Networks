@@ -9,29 +9,22 @@ import { GoogleSitesEmbedModal } from './components/GoogleSitesEmbedModal.jsx';
 import { PhoneGuideModal } from './components/PhoneGuideModal.jsx';
 import { PanicScreen } from './components/PanicScreen.jsx';
 import { DEFAULT_GAMES } from './data/defaultGames.js';
+import { safeStorage } from './utils/storage.js';
 import { SearchX } from 'lucide-react';
 
 export default function App() {
   const [games, setGames] = useState(() => {
-    try {
-      const customSaved = localStorage.getItem('niko_custom_games');
-      const customGames = customSaved ? JSON.parse(customSaved) : [];
-      return [...DEFAULT_GAMES, ...customGames];
-    } catch {
-      return DEFAULT_GAMES;
-    }
+    const customGames = safeStorage.getJSON('niko_custom_games', []);
+    const validCustom = Array.isArray(customGames) ? customGames : [];
+    return [...DEFAULT_GAMES, ...validCustom];
   });
   const [selectedGame, setSelectedGame] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [crtEnabled, setCrtEnabled] = useState(true);
   const [favorites, setFavorites] = useState(() => {
-    try {
-      const saved = localStorage.getItem('niko_favorites');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+    const saved = safeStorage.getJSON('niko_favorites', []);
+    return Array.isArray(saved) ? saved : [];
   });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -42,7 +35,7 @@ export default function App() {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isPanicActive, setIsPanicActive] = useState(false);
 
-  // Load games from games.json or fallback
+  // Load games from games.json or fallback gracefully without blanking
   useEffect(() => {
     async function loadGames() {
       try {
@@ -50,22 +43,24 @@ export default function App() {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            const customSaved = localStorage.getItem('niko_custom_games');
-            const customGames = customSaved ? JSON.parse(customSaved) : [];
-            setGames([...data, ...customGames]);
+            const customGames = safeStorage.getJSON('niko_custom_games', []);
+            const validCustom = Array.isArray(customGames) ? customGames : [];
+            setGames([...data, ...validCustom]);
           }
         }
       } catch (err) {
-        console.warn('Could not fetch ./games.json, using bundled defaults:', err);
+        console.warn("[Niko's Nightclub] Could not fetch ./games.json, using bundled defaults:", err);
       }
     }
     loadGames();
   }, []);
 
-  // Listen for ESC key for instant Panic Mode or closing modals
+  // Keyboard navigation & safe Escape handling:
+  // Prevents accidental Escape press from blanking into Panic Mode while playing or browsing
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        // 1. Close any open modal first
         if (isAddModalOpen || isJsonModalOpen || isCloakModalOpen || isGoogleSitesModalOpen || isPhoneModalOpen) {
           setIsAddModalOpen(false);
           setIsJsonModalOpen(false);
@@ -74,35 +69,48 @@ export default function App() {
           setIsPhoneModalOpen(false);
           return;
         }
+
+        // 2. If playing a game, return to arcade cabinet lobby
+        if (selectedGame) {
+          setSelectedGame(null);
+          return;
+        }
+      }
+
+      // Explicit Panic Mode keyboard shortcuts (Alt+P, Ctrl+Shift+X, or Ctrl+`)
+      if ((e.altKey && (e.key === 'p' || e.key === 'P')) ||
+          (e.ctrlKey && e.shiftKey && (e.key === 'X' || e.key === 'x')) ||
+          (e.ctrlKey && e.key === '`')) {
         setIsPanicActive(prev => !prev);
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAddModalOpen, isJsonModalOpen, isCloakModalOpen, isGoogleSitesModalOpen, isPhoneModalOpen]);
+  }, [isAddModalOpen, isJsonModalOpen, isCloakModalOpen, isGoogleSitesModalOpen, isPhoneModalOpen, selectedGame]);
 
-  // Save favorites to localStorage
+  // Save favorites safely
   const handleToggleFavorite = (id) => {
     setFavorites(prev => {
       const next = prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id];
-      localStorage.setItem('niko_favorites', JSON.stringify(next));
+      safeStorage.setItem('niko_favorites', next);
       return next;
     });
   };
 
-  // Add custom game
+  // Add custom game safely
   const handleAddGame = (newGame) => {
     setGames(prev => {
-      const updated = [newGame, ...prev];
-      const customList = updated.filter(g => g.isCustom);
-      localStorage.setItem('niko_custom_games', JSON.stringify(customList));
+      const updated = [newGame, ...(Array.isArray(prev) ? prev : DEFAULT_GAMES)];
+      const customList = updated.filter(g => g && g.isCustom);
+      safeStorage.setItem('niko_custom_games', customList);
       return updated;
     });
   };
 
-  // Reset defaults
+  // Reset defaults safely
   const handleResetDefaults = () => {
-    localStorage.removeItem('niko_custom_games');
+    safeStorage.removeItem('niko_custom_games');
     setGames(DEFAULT_GAMES);
     setIsJsonModalOpen(false);
   };
@@ -284,7 +292,7 @@ export default function App() {
             </button>
             <span>•</span>
             <span className="text-green-400">
-              Stealth: Press <kbd className="px-1.5 py-0.5 bg-black text-yellow-300 border border-yellow-400 font-arcade text-[9px]">ESC</kbd> for Panic Cloak
+              Stealth: Press <kbd className="px-1.5 py-0.5 bg-black text-yellow-300 border border-yellow-400 font-arcade text-[9px]">Alt+P</kbd> or click Cloak for Panic Shield
             </span>
           </div>
         </div>

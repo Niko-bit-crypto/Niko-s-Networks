@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Eye, FileText, CheckCircle2 } from 'lucide-react';
+import { Eye, FileText, CheckCircle2, ArrowLeft } from 'lucide-react';
 
 export const PanicScreen = ({ onExitPanic }) => {
   useEffect(() => {
@@ -14,6 +14,26 @@ export const PanicScreen = ({ onExitPanic }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-white text-slate-800 flex flex-col font-sans overflow-auto">
+      {/* Quick Return Ribbon */}
+      <div 
+        onClick={onExitPanic}
+        className="bg-[#07040d] text-cyan-300 px-4 py-1.5 text-xs font-mono flex items-center justify-between border-b-2 border-[#ff007f] cursor-pointer hover:bg-[#140b29] transition select-none"
+        title="Click anywhere on this bar to return to Niko's Nightclub"
+      >
+        <div className="flex items-center gap-2">
+          <span>🕹️</span>
+          <span className="font-bold text-white tracking-wider">NIKO&apos;S NIGHTCLUB — STEALTH CAMOUFLAGE ACTIVE</span>
+          <span className="text-slate-400 hidden sm:inline">(Click to Return to Arcade)</span>
+        </div>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onExitPanic(); }}
+          className="px-2.5 py-0.5 bg-[#39ff14] text-black font-bold text-[11px] rounded hover:bg-green-400 flex items-center gap-1 shadow-sm"
+        >
+          <ArrowLeft className="w-3 h-3" />
+          <span>RETURN TO ARCADE</span>
+        </button>
+      </div>
+
       {/* Mock Docs Header */}
       <header className="border-b border-slate-200 px-6 py-3 flex items-center justify-between bg-slate-50">
         <div className="flex items-center gap-3">
@@ -37,11 +57,11 @@ export const PanicScreen = ({ onExitPanic }) => {
         <button
           id="exit-panic-btn"
           onClick={onExitPanic}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded transition"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#140b29] hover:bg-black text-[#00f0ff] text-xs font-semibold rounded border border-[#00f0ff] shadow-sm transition"
           title="Return to Niko's Nightclub"
         >
-          <Eye className="w-3.5 h-3.5" />
-          <span>Resume Session</span>
+          <Eye className="w-3.5 h-3.5 text-[#39ff14]" />
+          <span>Resume Niko&apos;s Nightclub</span>
         </button>
       </header>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCcw, AlertTriangle } from 'lucide-react';
+import { RotateCcw, AlertTriangle, RefreshCw, Sparkles } from 'lucide-react';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -12,10 +12,14 @@ export class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("Arcade System Exception Caught:", error, errorInfo);
+    console.error("Niko's Nightclub Exception Caught:", error, errorInfo);
   }
 
-  handleReset = () => {
+  handleSoftResume = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  handleHardReset = () => {
     try {
       localStorage.removeItem('niko_custom_games');
       localStorage.removeItem('niko_favorites');
@@ -23,6 +27,10 @@ export class ErrorBoundary extends React.Component {
       console.error(e);
     }
     this.setState({ hasError: false, error: null });
+    window.location.reload();
+  };
+
+  handleFastReload = () => {
     window.location.reload();
   };
 
@@ -36,25 +44,43 @@ export class ErrorBoundary extends React.Component {
             </div>
 
             <h1 className="font-arcade text-base text-pink-400 mb-2 tracking-wider">
-              ARCADE HARDWARE GLITCH
+              ARCADE SAFETY RECOVERY
             </h1>
             <p className="font-terminal text-lg text-slate-300 mb-4">
-              Niko&apos;s Nightclub encountered an unexpected glitch. Don&apos;t worry, no high scores were harmed!
+              Niko&apos;s Nightclub caught an interruption before it could blank out. Choose a recovery option:
             </p>
 
-            <div className="bg-black border border-red-500/50 p-3 mb-6 text-left overflow-x-auto">
+            <div className="bg-black border border-red-500/50 p-3 mb-5 text-left overflow-x-auto">
               <p className="text-red-400 text-xs font-mono">
                 {this.state.error?.message || 'Unknown runtime error'}
               </p>
             </div>
 
-            <button
-              onClick={this.handleReset}
-              className="arcade-btn w-full py-3 bg-[#39ff14] hover:bg-green-400 text-black font-arcade text-xs font-bold border-2 border-black pixel-shadow-black flex items-center justify-center gap-2"
-            >
-              <RotateCcw className="w-4 h-4 text-black stroke-[3]" />
-              <span>REBOOT ARCADE SYSTEM</span>
-            </button>
+            <div className="flex flex-col gap-2.5">
+              <button
+                onClick={this.handleSoftResume}
+                className="arcade-btn w-full py-2.5 bg-[#00f0ff] hover:bg-cyan-400 text-black font-arcade text-xs font-bold border-2 border-black pixel-shadow-black flex items-center justify-center gap-2"
+              >
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>QUICK RESUME ARCADE</span>
+              </button>
+
+              <button
+                onClick={this.handleFastReload}
+                className="arcade-btn w-full py-2.5 bg-[#ffe600] hover:bg-yellow-400 text-black font-arcade text-xs font-bold border-2 border-black pixel-shadow-black flex items-center justify-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4 text-black stroke-[3]" />
+                <span>RELOAD BROWSER</span>
+              </button>
+
+              <button
+                onClick={this.handleHardReset}
+                className="arcade-btn w-full py-2.5 bg-[#ff007f] hover:bg-pink-600 text-white font-arcade text-xs font-bold border-2 border-black pixel-shadow-black flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4 text-white stroke-[3]" />
+                <span>CLEAR CACHE & REBOOT</span>
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -63,3 +89,4 @@ export class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
