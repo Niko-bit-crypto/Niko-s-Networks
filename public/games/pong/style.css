@@ -1,0 +1,129 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background: #090d16;
+  color: #ffffff;
+  font-family: 'Courier New', Courier, monospace, system-ui;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.pong-container {
+  background: #1e293b;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge {
+  color: #38bdf8;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.scores {
+  font-size: 26px;
+  font-weight: 800;
+  color: #f8fafc;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mode-toggle button {
+  background: #334155;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.canvas-box {
+  position: relative;
+  background: #020617;
+  border: 2px solid #38bdf8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay h2 {
+  font-size: 32px;
+  color: #38bdf8;
+  letter-spacing: 2px;
+}
+
+.overlay p {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+#startBtn {
+  background: #38bdf8;
+  color: #020617;
+  font-weight: 800;
+  border: none;
+  padding: 10px 24px;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#startBtn:hover {
+  background: #7dd3fc;
+}
+
+.controls-info {
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  gap: 20px;
+}
+
+.controls-info span {
+  background: #334155;
+  color: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}

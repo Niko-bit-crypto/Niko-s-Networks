@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Pong</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="pong-container">
+    <div class="header">
+      <span class="badge">RETRO PONG</span>
+      <div class="scores">
+        <span id="playerScore">0</span>
+        <span class="colon">:</span>
+        <span id="aiScore">0</span>
+      </div>
+      <div class="mode-toggle">
+        <button id="modeBtn">Mode: 1P (vs AI)</button>
+      </div>
+    </div>
+
+    <div class="canvas-box">
+      <canvas id="pongCanvas" width="600" height="400"></canvas>
+      <div id="overlay" class="overlay">
+        <h2>RETRO PONG</h2>
+        <p>First to 7 Points Wins</p>
+        <button id="startBtn">Start Game</button>
+      </div>
+    </div>
+
+    <div class="controls-info">
+      <div><b>1P:</b> Use <span>W</span>/<span>S</span> or <span>&uarr;</span>/<span>&darr;</span> or Mouse to Move</div>
+      <div><b>2P:</b> P1: <span>W</span>/<span>S</span> | P2: <span>&uarr;</span>/<span>&darr;</span></div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

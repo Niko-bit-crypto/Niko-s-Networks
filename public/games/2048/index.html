@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048 Puzzle</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="top-bar">
+      <div class="brand">2048</div>
+      <div class="stats">
+        <div class="stat-box">
+          <span>SCORE</span>
+          <b id="score">0</b>
+        </div>
+        <div class="stat-box">
+          <span>BEST</span>
+          <b id="best">0</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-bar">
+      <p>Join numbers and get to the <strong>2048 tile!</strong></p>
+      <button id="restartBtn">New Game</button>
+    </div>
+
+    <div class="grid-container" id="gridContainer">
+      <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+      <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+      <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+      <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
+      <div id="tileContainer" class="tile-container"></div>
+      <div id="gameOverlay" class="game-overlay hidden">
+        <h2 id="overlayMsg">Game Over!</h2>
+        <button id="tryAgainBtn">Try Again</button>
+      </div>
+    </div>
+
+    <div class="footer-hint">Use Arrow keys or W/A/S/D to slide tiles</div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

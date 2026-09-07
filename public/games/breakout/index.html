@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brick Breaker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="breakout-container">
+    <div class="hud">
+      <div>SCORE: <span id="score">0</span></div>
+      <div>LIVES: <span id="lives">&hearts; &hearts; &hearts;</span></div>
+      <div>STAGE: <span id="stage">1</span></div>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas id="breakoutCanvas" width="480" height="400"></canvas>
+      <div id="overlay" class="overlay">
+        <h2 id="overlayTitle">BRICK BREAKER</h2>
+        <p id="overlayDesc">Smash all bricks to advance</p>
+        <button id="startBtn">Play</button>
+      </div>
+    </div>
+
+    <div class="hint">Move mouse or use <span>&larr;</span> <span>&rarr;</span> / <span>A</span> <span>D</span> to control paddle</div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

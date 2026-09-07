@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris Classic</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="tetris-wrapper">
+    <div class="side-panel">
+      <div class="panel-box">
+        <h3>HOLD</h3>
+        <canvas id="holdCanvas" width="80" height="80"></canvas>
+      </div>
+      <div class="panel-box score-display">
+        <label>SCORE</label>
+        <span id="score">0</span>
+      </div>
+      <div class="panel-box">
+        <label>LINES</label>
+        <span id="lines">0</span>
+      </div>
+      <div class="panel-box">
+        <label>LEVEL</label>
+        <span id="level">1</span>
+      </div>
+    </div>
+
+    <div class="canvas-container">
+      <canvas id="gameCanvas" width="240" height="480"></canvas>
+      <div id="overlay" class="overlay">
+        <h2>TETRIS</h2>
+        <p>Stack & Clear Blocks</p>
+        <button id="start-btn">Play</button>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="panel-box">
+        <h3>NEXT</h3>
+        <canvas id="nextCanvas" width="80" height="80"></canvas>
+      </div>
+      <div class="controls-guide">
+        <p><b>&larr; &rarr;</b> Move</p>
+        <p><b>&uarr;</b> Rotate</p>
+        <p><b>&darr;</b> Soft Drop</p>
+        <p><b>SPACE</b> Hard Drop</p>
+        <p><b>C</b> Hold</p>
+      </div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
