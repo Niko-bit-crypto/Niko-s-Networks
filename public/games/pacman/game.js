@@ -108,6 +108,16 @@ function playEatGhostSound() {
   } catch (e) {}
 }
 
+function playRespawnSound() {
+  try {
+    const actx = getAudio();
+    if (!actx) return;
+    [440, 554.37, 659.25, 880].forEach((f, i) => {
+      setTimeout(() => playTone(f, 'triangle', 0.08, 0.12), i * 50);
+    });
+  } catch (e) {}
+}
+
 function playDeathSound() {
   try {
     const actx = getAudio();
@@ -136,26 +146,33 @@ let pacman = {
 
 // Ghosts
 const GHOST_DEFS = [
-  { name: 'Blinky', color: '#ff0000', homeX: 9, homeY: 8, startX: 9, startY: 8, waitTime: 0 },
-  { name: 'Pinky',  color: '#ffb8ff', homeX: 9, homeY: 10, startX: 9, startY: 10, waitTime: 90 },
-  { name: 'Inky',   color: '#00ffff', homeX: 8, homeY: 10, startX: 8, startY: 10, waitTime: 220 },
-  { name: 'Clyde',  color: '#ffb852', homeX: 10, homeY: 10, startX: 10, startY: 10, waitTime: 360 }
+  { name: 'Blinky', color: '#ff0000', startX: 9, startY: 8, waitTime: 0 },
+  { name: 'Pinky',  color: '#ffb8ff', startX: 9, startY: 10, waitTime: 60 },
+  { name: 'Inky',   color: '#00ffff', startX: 8, startY: 10, waitTime: 180 },
+  { name: 'Clyde',  color: '#ffb852', startX: 10, startY: 10, waitTime: 300 }
 ];
 
 let ghosts = [];
+let floatingScores = [];
+
+function addFloatingScore(x, y, text) {
+  floatingScores.push({ x, y, text, timer: 60 });
+}
 
 function initGhosts() {
   ghosts = GHOST_DEFS.map(def => ({
     ...def,
     x: def.startX * TILE_SIZE + 10,
     y: def.startY * TILE_SIZE + 10,
-    dx: 0,
-    dy: -1,
+    dx: def.waitTime === 0 ? -1 : 0,
+    dy: 0,
     speed: 1.8,
     state: def.waitTime === 0 ? 'chase' : 'house',
     timer: def.waitTime,
     frightened: false,
-    eaten: false
+    eaten: false,
+    eatenTimer: 0,
+    respawnGlow: 0
   }));
 }
 
@@ -182,6 +199,7 @@ function resetLevel(newMap = true) {
   pacman.rotation = 0;
 
   initGhosts();
+  floatingScores = [];
   frightenedTimer = 0;
   ghostsEatenInFright = 0;
 }
@@ -199,52 +217,84 @@ function updateHUD() {
   }
 }
 
-function isWall(col, row, isGhost = false, ghostEaten = false) {
-  // Handle tunnel wrap
-  if (row === 10 && (col < 0 || col >= COLS)) return false;
-  if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return true;
+function isWalkableForGhost(col, row, eaten = false, exiting = false) {
+  // Row 10 is the warp tunnel
+  if (row === 10) {
+    if (col < 0 || col >= COLS) return true;
+  }
+  if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
 
   const tile = map[row][col];
-  if (tile === 1) return true;
+  if (tile === 1) return false; // Wall
   if (tile === 5) {
-    // Gate: eaten ghosts or ghosts exiting house can pass
-    if (isGhost) return false;
-    return true; // Pacman cannot pass
+    // Gate: only ghosts entering (eaten) or exiting can cross
+    return eaten || exiting;
   }
-  if (tile === 4 && !isGhost) return true;
-  return false;
+  if (tile === 4) {
+    // Inside house: only allowed if eaten or entering
+    return eaten || exiting;
+  }
+  return true;
 }
 
-function canMove(x, y, dx, dy, isGhost = false, ghostEaten = false) {
-  const nextX = x + dx * 10;
-  const nextY = y + dy * 10;
-  const col = Math.floor(nextX / TILE_SIZE);
-  const row = Math.floor(nextY / TILE_SIZE);
-  return !isWall(col, row, isGhost, ghostEaten);
+function isWalkableForPac(col, row) {
+  // Row 10 warp tunnel
+  if (row === 10) {
+    if (col < 0 || col >= COLS) return true;
+  }
+  if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
+  const tile = map[row][col];
+  // Walls, gate, and house interior are impassable for Pac-Man
+  return tile !== 1 && tile !== 5 && tile !== 4;
 }
 
 function updatePacman() {
-  // Check if we can turn in next direction
-  if (pacman.nextDx !== 0 || pacman.nextDy !== 0) {
-    const col = Math.floor(pacman.x / TILE_SIZE);
-    const row = Math.floor(pacman.y / TILE_SIZE);
-    const centerX = col * TILE_SIZE + 10;
-    const centerY = row * TILE_SIZE + 10;
+  // 1. Instant 180 reverse in corridors
+  if (pacman.nextDx !== 0 && pacman.nextDx === -pacman.dx) {
+    pacman.dx = pacman.nextDx;
+    pacman.nextDx = 0;
+  } else if (pacman.nextDy !== 0 && pacman.nextDy === -pacman.dy) {
+    pacman.dy = pacman.nextDy;
+    pacman.nextDy = 0;
+  }
 
-    // Turn alignment tolerance
-    const distToCenter = Math.hypot(pacman.x - centerX, pacman.y - centerY);
-    if (distToCenter < 5 && canMove(centerX, centerY, pacman.nextDx, pacman.nextDy)) {
-      pacman.x = centerX;
-      pacman.y = centerY;
-      pacman.dx = pacman.nextDx;
-      pacman.dy = pacman.nextDy;
-      pacman.nextDx = 0;
-      pacman.nextDy = 0;
+  // 2. Current tile center
+  const c = Math.floor(pacman.x / TILE_SIZE);
+  const r = Math.floor(pacman.y / TILE_SIZE);
+  const centerX = c * TILE_SIZE + 10;
+  const centerY = r * TILE_SIZE + 10;
+
+  // Check if reached/crossed tile center
+  let reachedCenter = false;
+  if (pacman.dx > 0 && pacman.x <= centerX && (pacman.x + pacman.dx * pacman.speed) >= centerX) reachedCenter = true;
+  else if (pacman.dx < 0 && pacman.x >= centerX && (pacman.x + pacman.dx * pacman.speed) <= centerX) reachedCenter = true;
+  else if (pacman.dy > 0 && pacman.y <= centerY && (pacman.y + pacman.dy * pacman.speed) >= centerY) reachedCenter = true;
+  else if (pacman.dy < 0 && pacman.y >= centerY && (pacman.y + pacman.dy * pacman.speed) <= centerY) reachedCenter = true;
+  else if (pacman.dx === 0 && pacman.dy === 0) reachedCenter = true;
+
+  if (reachedCenter) {
+    pacman.x = centerX;
+    pacman.y = centerY;
+
+    // Try turning to buffered next direction
+    if (pacman.nextDx !== 0 || pacman.nextDy !== 0) {
+      if (isWalkableForPac(c + pacman.nextDx, r + pacman.nextDy)) {
+        pacman.dx = pacman.nextDx;
+        pacman.dy = pacman.nextDy;
+        pacman.nextDx = 0;
+        pacman.nextDy = 0;
+      }
+    }
+
+    // If forward path is blocked by wall, stop
+    if (!isWalkableForPac(c + pacman.dx, r + pacman.dy)) {
+      pacman.dx = 0;
+      pacman.dy = 0;
     }
   }
 
   // Move along current direction
-  if (canMove(pacman.x, pacman.y, pacman.dx, pacman.dy)) {
+  if (pacman.dx !== 0 || pacman.dy !== 0) {
     pacman.x += pacman.dx * pacman.speed;
     pacman.y += pacman.dy * pacman.speed;
 
@@ -262,19 +312,19 @@ function updatePacman() {
   }
 
   // Wrap around tunnel at row 10
-  if (pacman.y > 9 * TILE_SIZE && pacman.y < 11 * TILE_SIZE) {
+  if (r === 10) {
     if (pacman.x < -10) pacman.x = COLS * TILE_SIZE + 8;
     else if (pacman.x > COLS * TILE_SIZE + 10) pacman.x = -8;
   }
 
   // Eating dots / power pellets
-  const col = Math.floor(pacman.x / TILE_SIZE);
-  const row = Math.floor(pacman.y / TILE_SIZE);
-  if (col >= 0 && col < COLS && row >= 0 && row < ROWS) {
-    const tile = map[row][col];
+  const currentC = Math.floor(pacman.x / TILE_SIZE);
+  const currentR = Math.floor(pacman.y / TILE_SIZE);
+  if (currentC >= 0 && currentC < COLS && currentR >= 0 && currentR < ROWS) {
+    const tile = map[currentR][currentC];
     if (tile === 2) {
       // Normal dot
-      map[row][col] = 0;
+      map[currentR][currentC] = 0;
       score += 10;
       dotsRemaining--;
       playChomp();
@@ -285,16 +335,16 @@ function updatePacman() {
         fruitTimer = 500; // ~8 seconds
       }
     } else if (tile === 3) {
-      // Power Pellet / Energizer
-      map[row][col] = 0;
+      // Power Pellet / Energizer!
+      map[currentR][currentC] = 0;
       score += 50;
       dotsRemaining--;
-      frightenedTimer = 480; // 8 seconds
+      frightenedTimer = 480; // 8 seconds of vulnerability
       ghostsEatenInFright = 0;
       ghosts.forEach(g => {
-        if (g.state !== 'house' && !g.eaten) {
+        if (g.state !== 'house' && g.state !== 'entering' && !g.eaten) {
           g.frightened = true;
-          // Reverse direction on frightened
+          // Reverse direction immediately on frightened
           g.dx = -g.dx;
           g.dy = -g.dy;
         }
@@ -304,6 +354,7 @@ function updatePacman() {
       // Fruit eaten
       fruitActive = false;
       score += 100 * level;
+      addFloatingScore(pacman.x, pacman.y, `+${100 * level}`);
       playEatGhostSound();
     }
 
@@ -332,6 +383,7 @@ function levelClear() {
 }
 
 function updateGhosts() {
+  // Power pellet countdown
   if (frightenedTimer > 0) {
     frightenedTimer--;
     if (frightenedTimer === 0) {
@@ -347,90 +399,141 @@ function updateGhosts() {
   }
 
   ghosts.forEach(g => {
-    // Ghost house timer
+    // Respawn flash glow counter
+    if (g.respawnGlow > 0) g.respawnGlow--;
+
+    // 1. Ghost inside house: waiting and bobbing
     if (g.state === 'house') {
       g.timer--;
-      // Bounce up and down in house
-      g.y += g.dy * 0.8;
-      if (g.y < 10 * TILE_SIZE + 4) g.dy = 1;
-      if (g.y > 10 * TILE_SIZE + 16) g.dy = -1;
+      // Gentle bob up and down
+      if (!g.dy) g.dy = 1;
+      g.y += g.dy * 0.7;
+      if (g.y < 10 * TILE_SIZE + 5) g.dy = 1;
+      if (g.y > 10 * TILE_SIZE + 15) g.dy = -1;
 
       if (g.timer <= 0) {
         g.state = 'leaving';
-        g.x = 9 * TILE_SIZE + 10;
+        g.x = 9 * TILE_SIZE + 10; // Center in front of door
       }
       return;
     }
 
-    // Ghost leaving house through door (row 9, col 9)
+    // 2. Ghost leaving house through pink door (row 9, col 9)
     if (g.state === 'leaving') {
-      g.y -= 1.5;
+      g.x = 9 * TILE_SIZE + 10;
+      g.y -= 1.6;
       if (g.y <= 8 * TILE_SIZE + 10) {
         g.y = 8 * TILE_SIZE + 10;
         g.state = 'chase';
+        // Pick left or right into the maze
         g.dx = Math.random() < 0.5 ? -1 : 1;
         g.dy = 0;
       }
       return;
     }
 
-    // Ghost returning to house when eaten
-    if (g.eaten) {
-      const targetX = 9 * TILE_SIZE + 10;
-      const targetY = 8 * TILE_SIZE + 10;
-      const dist = Math.hypot(g.x - targetX, g.y - targetY);
-      if (dist < 8) {
+    // 3. Eaten ghost eyes entering the house door to respawn
+    if (g.state === 'entering') {
+      g.x = 9 * TILE_SIZE + 10;
+      g.y += 2.0;
+      if (g.y >= 10 * TILE_SIZE + 10) {
+        // REGAINS BODY & RESPAWNS!
+        g.y = 10 * TILE_SIZE + 10;
         g.eaten = false;
         g.frightened = false;
-        g.state = 'leaving';
+        g.state = 'house';
+        g.timer = 60; // Wait 1 second in house before emerging
+        g.respawnGlow = 45; // Visual respawn burst
+        playRespawnSound();
+      }
+      return;
+    }
+
+    // Safety fallback: if eyes are lost for too long, teleport back to house
+    if (g.eaten) {
+      g.eatenTimer++;
+      if (g.eatenTimer > 600) {
+        g.x = 9 * TILE_SIZE + 10;
+        g.y = 10 * TILE_SIZE + 10;
+        g.eaten = false;
+        g.frightened = false;
+        g.eatenTimer = 0;
+        g.state = 'house';
+        g.timer = 50;
+        playRespawnSound();
         return;
       }
     }
 
-    const currentSpeed = g.eaten ? 3.0 : g.frightened ? 1.2 : 1.7 + level * 0.08;
+    // Determine speed
+    const currentSpeed = g.eaten ? 3.6 : g.frightened ? 1.15 : 1.7 + Math.min(level * 0.08, 0.6);
 
-    // Corridor intersection movement
-    const col = Math.floor(g.x / TILE_SIZE);
-    const row = Math.floor(g.y / TILE_SIZE);
-    const centerX = col * TILE_SIZE + 10;
-    const centerY = row * TILE_SIZE + 10;
-    const distToCenter = Math.hypot(g.x - centerX, g.y - centerY);
+    // Current tile
+    const c = Math.floor(g.x / TILE_SIZE);
+    const r = Math.floor(g.y / TILE_SIZE);
+    const centerX = c * TILE_SIZE + 10;
+    const centerY = r * TILE_SIZE + 10;
 
-    if (distToCenter < 3) {
-      // At intersection, pick best direction to target
+    // Check if ghost reaches or crosses tile center
+    let reachedCenter = false;
+    if (g.dx > 0 && g.x <= centerX && (g.x + g.dx * currentSpeed) >= centerX) reachedCenter = true;
+    else if (g.dx < 0 && g.x >= centerX && (g.x + g.dx * currentSpeed) <= centerX) reachedCenter = true;
+    else if (g.dy > 0 && g.y <= centerY && (g.y + g.dy * currentSpeed) >= centerY) reachedCenter = true;
+    else if (g.dy < 0 && g.y >= centerY && (g.y + g.dy * currentSpeed) <= centerY) reachedCenter = true;
+    else if (g.dx === 0 && g.dy === 0) reachedCenter = true;
+
+    if (reachedCenter) {
+      g.x = centerX;
+      g.y = centerY;
+
+      // If eaten ghost reaches house door entrance at (9, 8), transition to entering
+      if (g.eaten && c === 9 && r === 8) {
+        g.state = 'entering';
+        g.dx = 0;
+        g.dy = 1;
+        return;
+      }
+
+      // Target selection
       let targetX = pacman.x;
       let targetY = pacman.y;
 
       if (g.eaten) {
+        // Eaten eyes head straight for the ghost house door
         targetX = 9 * TILE_SIZE + 10;
         targetY = 8 * TILE_SIZE + 10;
       } else if (g.frightened) {
-        // Random target
-        targetX = Math.random() * canvas.width;
-        targetY = Math.random() * canvas.height;
+        // Frightened ghosts wander unpredictably
+        targetX = Math.floor(Math.random() * COLS) * TILE_SIZE + 10;
+        targetY = Math.floor(Math.random() * ROWS) * TILE_SIZE + 10;
       } else {
-        // Individual Ghost Personalities
+        // Personality-based chasing
         if (g.name === 'Blinky') {
+          // Direct chaser
           targetX = pacman.x;
           targetY = pacman.y;
         } else if (g.name === 'Pinky') {
-          targetX = pacman.x + pacman.dx * 60;
-          targetY = pacman.y + pacman.dy * 60;
+          // Ambusher: 4 tiles ahead of Pac-Man
+          targetX = pacman.x + pacman.dx * 80;
+          targetY = pacman.y + pacman.dy * 80;
         } else if (g.name === 'Inky') {
+          // Flanker
           targetX = pacman.x + (pacman.x - ghosts[0].x);
           targetY = pacman.y + (pacman.y - ghosts[0].y);
         } else if (g.name === 'Clyde') {
-          const d = Math.hypot(g.x - pacman.x, g.y - pacman.y);
-          if (d > 120) {
+          // Coward: chases when far, flees to bottom-left corner when close
+          const dist = Math.hypot(g.x - pacman.x, g.y - pacman.y);
+          if (dist > 140) {
             targetX = pacman.x;
             targetY = pacman.y;
           } else {
-            targetX = 20;
-            targetY = canvas.height - 20;
+            targetX = 1 * TILE_SIZE + 10;
+            targetY = 19 * TILE_SIZE + 10;
           }
         }
       }
 
+      // Candidate directions: Up, Left, Down, Right
       const dirs = [
         { dx: 0, dy: -1 },
         { dx: -1, dy: 0 },
@@ -438,53 +541,65 @@ function updateGhosts() {
         { dx: 1, dy: 0 }
       ];
 
-      // Exclude 180 reverse unless stuck
+      // Exclude 180-degree reverse unless dead end
       let validDirs = dirs.filter(d => {
         if (d.dx === -g.dx && d.dy === -g.dy) return false;
-        return canMove(centerX, centerY, d.dx, d.dy, true, g.eaten);
+        return isWalkableForGhost(c + d.dx, r + d.dy, g.eaten, false);
       });
 
       if (validDirs.length === 0) {
-        validDirs = dirs.filter(d => canMove(centerX, centerY, d.dx, d.dy, true, g.eaten));
+        // Dead end: allow reverse
+        validDirs = dirs.filter(d => isWalkableForGhost(c + d.dx, r + d.dy, g.eaten, false));
       }
 
       if (validDirs.length > 0) {
-        // Sort by distance to target
-        validDirs.sort((a, b) => {
-          const distA = Math.hypot((centerX + a.dx * TILE_SIZE) - targetX, (centerY + a.dy * TILE_SIZE) - targetY);
-          const distB = Math.hypot((centerX + b.dx * TILE_SIZE) - targetX, (centerY + b.dy * TILE_SIZE) - targetY);
-          return distA - distB;
-        });
-
-        g.x = centerX;
-        g.y = centerY;
-        g.dx = validDirs[0].dx;
-        g.dy = validDirs[0].dy;
+        if (g.frightened && !g.eaten) {
+          // Random turn at intersections for frightened ghosts
+          const pick = validDirs[Math.floor(Math.random() * validDirs.length)];
+          g.dx = pick.dx;
+          g.dy = pick.dy;
+        } else {
+          // Sort by distance to target
+          validDirs.sort((a, b) => {
+            const ax = (c + a.dx) * TILE_SIZE + 10;
+            const ay = (r + a.dy) * TILE_SIZE + 10;
+            const bx = (c + b.dx) * TILE_SIZE + 10;
+            const by = (r + b.dy) * TILE_SIZE + 10;
+            const distA = Math.hypot(ax - targetX, ay - targetY);
+            const distB = Math.hypot(bx - targetX, by - targetY);
+            return distA - distB;
+          });
+          g.dx = validDirs[0].dx;
+          g.dy = validDirs[0].dy;
+        }
       }
     }
 
+    // Move ghost
     g.x += g.dx * currentSpeed;
     g.y += g.dy * currentSpeed;
 
-    // Tunnel wrap for ghosts
-    if (g.y > 9 * TILE_SIZE && g.y < 11 * TILE_SIZE) {
+    // Warp tunnel row 10
+    if (r === 10) {
       if (g.x < -10) g.x = COLS * TILE_SIZE + 8;
       else if (g.x > COLS * TILE_SIZE + 10) g.x = -8;
     }
 
-    // Ghost collision with Pac-Man
+    // Collision with Pac-Man
     const distToPac = Math.hypot(g.x - pacman.x, g.y - pacman.y);
-    if (distToPac < 14) {
+    if (distToPac < 15) {
       if (g.frightened && !g.eaten) {
-        // Eat ghost!
+        // EAT THE GHOST!
         g.eaten = true;
         g.frightened = false;
+        g.eatenTimer = 0;
         ghostsEatenInFright++;
-        const pts = 200 * Math.pow(2, ghostsEatenInFright - 1);
+        const pts = 200 * Math.pow(2, Math.min(ghostsEatenInFright - 1, 3));
         score += pts;
+        addFloatingScore(g.x, g.y, `+${pts}`);
         playEatGhostSound();
-      } else if (!g.eaten && g.state !== 'house' && g.state !== 'leaving') {
-        // Pacman caught!
+      } else if (!g.eaten && !g.frightened && g.state !== 'house' && g.state !== 'leaving' && g.state !== 'entering') {
+        // Pac-Man caught by ghost!
         pacmanDeath();
       }
     }
@@ -596,10 +711,23 @@ function draw() {
       // Just eyes
       drawGhostEyes(ctx, g.dx, g.dy);
     } else {
+      // Respawn sparkle/glow ring
+      if (g.respawnGlow > 0) {
+        ctx.save();
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = '#00ffff';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(0, 0, 10 + (45 - g.respawnGlow) * 0.2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
       let ghostColor = g.color;
       if (g.frightened) {
         // Flashing near end of frightened duration
-        if (frightenedTimer < 120 && Math.floor(frightenedTimer / 15) % 2 === 0) {
+        if (frightenedTimer < 140 && Math.floor(frightenedTimer / 12) % 2 === 0) {
           ghostColor = '#ffffff';
         } else {
           ghostColor = '#1d4ed8';
@@ -642,6 +770,20 @@ function draw() {
     }
 
     ctx.restore();
+  });
+
+  // Floating Score Popups (e.g. +200, +400, +800)
+  floatingScores = floatingScores.filter(s => {
+    s.y -= 0.4;
+    s.timer--;
+    ctx.save();
+    ctx.font = 'bold 10px "Press Start 2P", monospace, sans-serif';
+    ctx.fillStyle = `rgba(0, 255, 255, ${Math.max(0, s.timer / 60)})`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s.text, s.x, s.y);
+    ctx.restore();
+    return s.timer > 0;
   });
 }
 
