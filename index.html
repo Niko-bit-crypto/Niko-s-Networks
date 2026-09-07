@@ -17,43 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   </head>
   <body style="margin: 0; background-color: #07040d; color: #e2e8f0; min-height: 100vh; overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;">
-    <script>
-      // Global Fail-Safe Error Trap: Prevents Blank Screens
-      window.__NIKO_CRASH_HANDLER__ = function(errorMsg, source, lineno) {
-        console.error("Niko's Nightclub Startup/Runtime Guard:", errorMsg, source, lineno);
-        var root = document.getElementById('root');
-        if (root && (!root.children || root.children.length === 0 || root.querySelector('#niko-boot-screen'))) {
-          root.innerHTML = '<div style="min-height: 100vh; background: #07040d; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; font-family: monospace; text-align: center;">' +
-            '<div style="max-width: 500px; width: 100%; background: #140b29; border: 4px solid #ff007f; box-shadow: 6px 6px 0px #000; padding: 24px;">' +
-            '<div style="font-size: 36px; margin-bottom: 12px;">🕹️</div>' +
-            '<h1 style="color: #00f0ff; font-size: 18px; margin: 0 0 10px 0; letter-spacing: 2px;">NIKO\'S NIGHTCLUB // SAFE RECOVERY</h1>' +
-            '<p style="color: #ff77bc; font-size: 14px; line-height: 1.5; margin: 0 0 16px 0;">An unexpected interruption was caught before display. The auto-recovery engine is active.</p>' +
-            '<div style="background: #000; border: 1px solid #39ff14; padding: 10px; font-size: 12px; color: #39ff14; text-align: left; margin-bottom: 20px; word-break: break-all;">' +
-            (errorMsg || 'Safe Boot Mode Engaged') + '</div>' +
-            '<button onclick="localStorage.clear(); window.location.reload();" style="display: block; width: 100%; padding: 12px; background: #39ff14; color: #000; font-weight: bold; border: 2px solid #000; box-shadow: 4px 4px 0 #000; cursor: pointer; font-size: 13px; letter-spacing: 1px; margin-bottom: 10px;">REBOOT ARCADE (SAFE RESET)</button>' +
-            '<button onclick="window.location.reload();" style="display: block; width: 100%; padding: 10px; background: #00f0ff; color: #000; font-weight: bold; border: 2px solid #000; box-shadow: 4px 4px 0 #000; cursor: pointer; font-size: 12px;">FAST RELOAD</button>' +
-            '</div></div>';
-        }
-      };
-      window.addEventListener('error', function(e) {
-        window.__NIKO_CRASH_HANDLER__(e.message || 'Script Execution Error', e.filename, e.lineno);
-      });
-      window.addEventListener('unhandledrejection', function(e) {
-        window.__NIKO_CRASH_HANDLER__(e.reason ? (e.reason.message || String(e.reason)) : 'Promise Rejection');
-      });
-    </script>
-
-    <div id="root">
-      <!-- Instant 80s Retro Boot Screen (Guarantees zero blank-screen flash while bundle loads) -->
-      <div id="niko-boot-screen" style="min-height: 100vh; background: #07040d; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; font-family: monospace; text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 16px; animation: pulse 1s infinite alternate;">🕹️</div>
-        <h2 style="color: #00f0ff; font-size: 18px; margin: 0 0 8px 0; letter-spacing: 3px;">NIKO'S NIGHTCLUB</h2>
-        <p style="color: #ff007f; font-size: 14px; margin: 0 0 20px 0; letter-spacing: 1px;">LOADING 1980s ARCADE SYSTEM...</p>
-        <div style="width: 220px; height: 12px; border: 2px solid #00f0ff; background: #000; padding: 2px; box-shadow: 3px 3px 0 #000;">
-          <div style="width: 100%; height: 100%; background: #39ff14;"></div>
-        </div>
-      </div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
