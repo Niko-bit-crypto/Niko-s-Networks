@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pac-Man Classic</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="pacman-container">
+    <div class="arcade-hud">
+      <div class="hud-item">
+        <span class="hud-label">1UP</span>
+        <span class="hud-value" id="score">00</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">HIGH SCORE</span>
+        <span class="hud-value" id="high-score">00</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">LEVEL</span>
+        <span class="hud-value" id="level">1</span>
+      </div>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas id="pacmanCanvas" width="380" height="420"></canvas>
+      <div id="overlay" class="overlay">
+        <div class="overlay-card">
+          <div class="marquee-title">PAC-MAN</div>
+          <p id="overlay-msg">CHOMP THE PELLETS & AVOID GHOSTS!</p>
+          <div class="ghost-parade">
+            <span class="ghost red"></span>
+            <span class="ghost pink"></span>
+            <span class="ghost cyan"></span>
+            <span class="ghost orange"></span>
+          </div>
+          <button id="start-btn">INSERT COIN / START</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="lives-box" id="lives-display"></div>
+      <div class="controls-hint">
+        <span>&uarr;&darr;&larr;&rarr;</span> or <span>W A S D</span> to Turn • <span>Swipe</span> on Mobile
+      </div>
+      <div class="fruit-box" id="fruit-display">🍒</div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
