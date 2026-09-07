@@ -168,5 +168,82 @@ window.addEventListener('keydown', e => {
   }
 });
 
+// Touch swipe controls for mobile
+let touchStartX = 0;
+let touchStartY = 0;
+
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length > 0) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }
+  if (!isRunning) {
+    startGame();
+  }
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  if (e.changedTouches.length > 0) {
+    const dxTouch = e.changedTouches[0].clientX - touchStartX;
+    const dyTouch = e.changedTouches[0].clientY - touchStartY;
+    const absDx = Math.abs(dxTouch);
+    const absDy = Math.abs(dyTouch);
+
+    if (Math.max(absDx, absDy) > 20) {
+      if (absDx > absDy) {
+        // Horizontal swipe
+        if (dxTouch > 0 && dx !== -1) {
+          nextDx = 1;
+          nextDy = 0;
+        } else if (dxTouch < 0 && dx !== 1) {
+          nextDx = -1;
+          nextDy = 0;
+        }
+      } else {
+        // Vertical swipe
+        if (dyTouch > 0 && dy !== -1) {
+          nextDx = 0;
+          nextDy = 1;
+        } else if (dyTouch < 0 && dy !== 1) {
+          nextDx = 0;
+          nextDy = -1;
+        }
+      }
+    }
+  }
+  e.preventDefault();
+}, { passive: false });
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    const key = e.data.key;
+    if (e.data.action === 'keydown') {
+      if (!isRunning && (key === ' ' || key === 'Enter' || key === 'Start')) {
+        startGame();
+        return;
+      }
+      if ((key === 'ArrowUp' || key === 'w' || key === 'W') && dy !== 1) {
+        nextDx = 0;
+        nextDy = -1;
+      } else if ((key === 'ArrowDown' || key === 's' || key === 'S') && dy !== -1) {
+        nextDx = 0;
+        nextDy = 1;
+      } else if ((key === 'ArrowLeft' || key === 'a' || key === 'A') && dx !== 1) {
+        nextDx = -1;
+        nextDy = 0;
+      } else if ((key === 'ArrowRight' || key === 'd' || key === 'D') && dx !== -1) {
+        nextDx = 1;
+        nextDy = 0;
+      }
+    }
+  }
+});
+
 startBtn.addEventListener('click', startGame);
 draw();

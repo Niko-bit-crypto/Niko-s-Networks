@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft,
   RotateCcw,
@@ -9,8 +9,9 @@ import {
   Code,
   Terminal,
   Info,
-  Tv
+  Smartphone
 } from 'lucide-react';
+import { VirtualGamepad } from './VirtualGamepad.jsx';
 
 export const GamePlayer = ({
   game,
@@ -24,6 +25,7 @@ export const GamePlayer = ({
   const [copied, setCopied] = useState(false);
   const [showJsonSnippet, setShowJsonSnippet] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
+  const [showGamepad, setShowGamepad] = useState(true);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -73,11 +75,45 @@ export const GamePlayer = ({
     window.open(resolvedIframeSrc, '_blank', 'noopener,noreferrer');
   };
 
+  // Dispatch key event to game iframe via both direct KeyboardEvent and postMessage
+  const handleSendKey = useCallback((type, key, code) => {
+    try {
+      const win = iframeRef.current?.contentWindow;
+      if (win) {
+        // Direct event dispatch if same-origin / srcdoc
+        const evt = new win.KeyboardEvent(type, {
+          key: key,
+          code: code || key,
+          bubbles: true,
+          cancelable: true
+        });
+        win.dispatchEvent(evt);
+        if (win.document) {
+          win.document.dispatchEvent(evt);
+        }
+      }
+    } catch {
+      // In case of cross-origin or sandbox restrictions, postMessage handles it
+    }
+
+    try {
+      // Always send postMessage as universal fallback
+      iframeRef.current?.contentWindow?.postMessage({
+        type: 'arcade-key',
+        action: type,
+        key: key,
+        code: code || key
+      }, '*');
+    } catch {
+      // Ignore
+    }
+  }, []);
+
   return (
-    <div className="flex flex-col gap-4 max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4">
+    <div className="flex flex-col gap-4 max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
       {/* 80s Arcade Player Control Marquee */}
-      <div className="flex items-center justify-between flex-wrap gap-3 bg-[#110924] border-4 border-black pixel-shadow-black p-3.5">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between flex-wrap gap-2.5 bg-[#110924] border-4 border-black pixel-shadow-black p-3 sm:p-3.5">
+        <div className="flex items-center gap-2.5">
           <button
             id="player-back-btn"
             onClick={onBack}
@@ -88,7 +124,7 @@ export const GamePlayer = ({
           </button>
 
           <div>
-            <h2 className="font-arcade text-sm sm:text-base text-white neon-glow-magenta flex items-center gap-2">
+            <h2 className="font-arcade text-xs sm:text-base text-white neon-glow-magenta flex items-center gap-2 flex-wrap">
               <span>{game.title}</span>
               <span className="text-[9px] px-1.5 py-0.5 bg-[#ffe600] text-black border border-black font-bold">
                 {game.category.toUpperCase()}
@@ -98,7 +134,23 @@ export const GamePlayer = ({
         </div>
 
         {/* Machine Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          {/* Mobile Gamepad Toggle */}
+          <button
+            id="player-gamepad-toggle-btn"
+            onClick={() => setShowGamepad(prev => !prev)}
+            title="Toggle On-Screen Touch Gamepad"
+            className={`arcade-btn flex items-center gap-1 px-2.5 py-1.5 font-arcade text-[10px] font-bold border-2 border-black pixel-shadow-black transition ${
+              showGamepad
+                ? 'bg-[#39ff14] text-black'
+                : 'bg-[#251545] text-slate-300 hover:text-white'
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">GAMEPAD</span>
+            <span>{showGamepad ? 'ON' : 'OFF'}</span>
+          </button>
+
           <button
             id="player-restart-btn"
             onClick={handleRestart}
@@ -121,7 +173,7 @@ export const GamePlayer = ({
             id="player-newtab-btn"
             onClick={handleOpenNewTab}
             title="Open game directly in a new window"
-            className="arcade-btn p-2 bg-[#39ff14] hover:bg-green-400 text-black border-2 border-black pixel-shadow-black"
+            className="arcade-btn p-2 bg-[#00f0ff] hover:bg-cyan-300 text-black border-2 border-black pixel-shadow-black"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </button>
@@ -130,10 +182,10 @@ export const GamePlayer = ({
             id="player-copy-iframe-btn"
             onClick={handleCopyIframe}
             title="Copy stored Iframe tag"
-            className="arcade-btn flex items-center gap-1.5 px-3 py-2 bg-[#20153f] hover:bg-[#2e1d5a] text-cyan-300 font-arcade text-[10px] font-bold border-2 border-black pixel-shadow-black"
+            className="arcade-btn hidden md:flex items-center gap-1.5 px-3 py-2 bg-[#20153f] hover:bg-[#2e1d5a] text-cyan-300 font-arcade text-[10px] font-bold border-2 border-black pixel-shadow-black"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Code className="w-3.5 h-3.5 text-yellow-400" />}
-            <span className="hidden sm:inline">{copied ? 'COPIED!' : 'COPY IFRAME'}</span>
+            <span>{copied ? 'COPIED!' : 'COPY IFRAME'}</span>
           </button>
         </div>
       </div>
@@ -146,17 +198,19 @@ export const GamePlayer = ({
             <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
             <span className="text-white neon-glow-cyan font-bold">NIKO&apos;S NETWORK CABINET #084</span>
           </div>
-          <div className="text-yellow-300 hidden sm:block">
-            ★ 25¢ INSERT COIN TO CONTINUE ★
+          <div className="text-yellow-300 text-[9px] sm:text-[10px]">
+            ★ TOUCH OR USE D-PAD BELOW ★
           </div>
         </div>
 
-        {/* Embedded CRT Screen Container */}
+        {/* Embedded CRT Screen Container - Responsively sized for phone screens */}
         <div
           ref={containerRef}
           id="game-iframe-stage"
-          className={`relative w-full border-4 border-black bg-black shadow-inner flex flex-col items-center justify-center overflow-hidden ${
-            isFullscreen ? 'h-screen w-screen border-none p-0' : 'h-[580px]'
+          className={`relative w-full border-4 border-black bg-black shadow-inner flex flex-col items-center justify-center overflow-hidden transition-all ${
+            isFullscreen
+              ? 'h-screen w-screen border-none p-0'
+              : 'h-[52vh] min-h-[310px] sm:h-[480px] md:h-[560px] max-h-[620px]'
           }`}
         >
           {/* Iframe with offline in-memory srcDoc fallback */}
@@ -166,7 +220,7 @@ export const GamePlayer = ({
             src={game.srcDoc ? undefined : resolvedIframeSrc}
             srcDoc={game.srcDoc || undefined}
             title={game.title}
-            className="w-full h-full border-0 bg-black"
+            className="w-full h-full border-0 bg-black touch-manipulation"
             allow="autoplay; fullscreen; keyboard"
             sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
             loading="eager"
@@ -182,8 +236,7 @@ export const GamePlayer = ({
         <div className="flex items-center justify-between pt-2 mt-2 border-t-2 border-black text-[11px] font-terminal text-cyan-300 px-2">
           <span className="flex items-center gap-1 text-[#39ff14]">
             <span>● MACHINE ACTIVE</span>
-            <span>-</span>
-            <span>60 FPS CRT REFRESH</span>
+            <span className="hidden sm:inline">- 60 FPS CRT REFRESH</span>
           </span>
           <div className="flex items-center gap-3">
             <span className="text-yellow-300 font-arcade text-[9px] bg-black px-2 py-0.5 border border-yellow-400">
@@ -192,6 +245,15 @@ export const GamePlayer = ({
           </div>
         </div>
       </div>
+
+      {/* 🎮 ON-SCREEN TOUCH GAMEPAD (FOR PHONES, TABLETS & ACCESSIBILITY) */}
+      {showGamepad && (
+        <VirtualGamepad
+          game={game}
+          onSendKey={handleSendKey}
+          onRestart={handleRestart}
+        />
+      )}
 
       {/* Retro Info & Instruction Blocks */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -203,6 +265,9 @@ export const GamePlayer = ({
           </div>
           <p className="font-terminal text-base sm:text-lg text-green-300 bg-black p-3 border-2 border-[#39ff14]/40 leading-snug tracking-wider">
             {game.controls}
+          </p>
+          <p className="text-[11px] text-slate-400 font-terminal">
+            📱 On phone: use the on-screen touch controller or tap and swipe directly on the canvas!
           </p>
         </div>
 

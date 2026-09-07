@@ -308,5 +308,95 @@ window.addEventListener('keydown', e => {
   draw();
 });
 
+// Touch gestures for mobile
+let tetrisTouchStartX = 0;
+let tetrisTouchStartY = 0;
+let touchMoved = false;
+
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length > 0) {
+    tetrisTouchStartX = e.touches[0].clientX;
+    tetrisTouchStartY = e.touches[0].clientY;
+    touchMoved = false;
+  }
+  if (!isPlaying) {
+    startGame();
+  }
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  if (!isPlaying || !currentPiece) return;
+  if (e.touches.length > 0) {
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const dx = currentX - tetrisTouchStartX;
+    const dy = currentY - tetrisTouchStartY;
+
+    if (Math.abs(dx) > 28) {
+      touchMoved = true;
+      if (dx > 0 && !collides(board, currentPiece, 1, 0)) {
+        currentPiece.x++;
+        tetrisTouchStartX = currentX;
+      } else if (dx < 0 && !collides(board, currentPiece, -1, 0)) {
+        currentPiece.x--;
+        tetrisTouchStartX = currentX;
+      }
+      draw();
+    } else if (dy > 35) {
+      touchMoved = true;
+      drop();
+      tetrisTouchStartY = currentY;
+      draw();
+    }
+  }
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  if (!isPlaying || !currentPiece) return;
+  // If tap with minimal movement, rotate!
+  if (!touchMoved) {
+    const rotated = rotate(currentPiece.matrix);
+    if (!collides(board, { ...currentPiece, matrix: rotated })) {
+      currentPiece.matrix = rotated;
+      draw();
+    }
+  }
+  e.preventDefault();
+}, { passive: false });
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    const key = e.data.key;
+    if (e.data.action === 'keydown') {
+      if (!isPlaying) {
+        if (key === ' ' || key === 'Enter' || key === 'Start') startGame();
+        return;
+      }
+      if (key === 'ArrowLeft') {
+        if (!collides(board, currentPiece, -1, 0)) currentPiece.x--;
+      } else if (key === 'ArrowRight') {
+        if (!collides(board, currentPiece, 1, 0)) currentPiece.x++;
+      } else if (key === 'ArrowDown') {
+        drop();
+        score += 1;
+        scoreEl.textContent = score;
+      } else if (key === 'ArrowUp' || key === 'a' || key === 'A' || key === 'Rotate') {
+        const rotated = rotate(currentPiece.matrix);
+        if (!collides(board, { ...currentPiece, matrix: rotated })) {
+          currentPiece.matrix = rotated;
+        }
+      } else if (key === ' ' || key === 'HardDrop') {
+        hardDrop();
+      } else if (key === 'c' || key === 'C' || key === 'b' || key === 'B' || key === 'Hold') {
+        hold();
+      }
+      draw();
+    }
+  }
+});
+
 startBtn.addEventListener('click', startGame);
 draw();

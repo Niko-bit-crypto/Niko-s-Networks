@@ -168,6 +168,50 @@ window.addEventListener('keydown', e => {
   if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') handleInput('down');
 });
 
+// Mobile Touch Swipe detection for 2048
+let touchStartX2048 = 0;
+let touchStartY2048 = 0;
+
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 0) {
+    touchStartX2048 = e.touches[0].clientX;
+    touchStartY2048 = e.touches[0].clientY;
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (e.changedTouches.length > 0) {
+    const dx = e.changedTouches[0].clientX - touchStartX2048;
+    const dy = e.changedTouches[0].clientY - touchStartY2048;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (Math.max(absDx, absDy) > 25) {
+      if (absDx > absDy) {
+        if (dx > 0) handleInput('right');
+        else handleInput('left');
+      } else {
+        if (dy > 0) handleInput('down');
+        else handleInput('up');
+      }
+    }
+  }
+}, { passive: true });
+
+// Mobile Gamepad PostMessage Listener
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'arcade-key') {
+    const key = e.data.key;
+    if (e.data.action === 'keydown') {
+      if (key === 'ArrowLeft' || key === 'a' || key === 'A') handleInput('left');
+      if (key === 'ArrowRight' || key === 'd' || key === 'D') handleInput('right');
+      if (key === 'ArrowUp' || key === 'w' || key === 'W') handleInput('up');
+      if (key === 'ArrowDown' || key === 's' || key === 'S') handleInput('down');
+      if (key === ' ' || key === 'Enter' || key === 'Start' || key === 'r' || key === 'R') init();
+    }
+  }
+});
+
 restartBtn.addEventListener('click', init);
 tryAgainBtn.addEventListener('click', init);
 

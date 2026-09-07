@@ -6,6 +6,7 @@ import { AddGameModal } from './components/AddGameModal.jsx';
 import { JsonViewerModal } from './components/JsonViewerModal.jsx';
 import { CloakModal } from './components/CloakModal.jsx';
 import { GoogleSitesEmbedModal } from './components/GoogleSitesEmbedModal.jsx';
+import { PhoneGuideModal } from './components/PhoneGuideModal.jsx';
 import { PanicScreen } from './components/PanicScreen.jsx';
 import { DEFAULT_GAMES } from './data/defaultGames.js';
 import { SearchX } from 'lucide-react';
@@ -38,6 +39,7 @@ export default function App() {
   const [highlightGameForJson, setHighlightGameForJson] = useState(null);
   const [isCloakModalOpen, setIsCloakModalOpen] = useState(false);
   const [isGoogleSitesModalOpen, setIsGoogleSitesModalOpen] = useState(false);
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isPanicActive, setIsPanicActive] = useState(false);
 
   // Load games from games.json or fallback
@@ -64,11 +66,12 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        if (isAddModalOpen || isJsonModalOpen || isCloakModalOpen || isGoogleSitesModalOpen) {
+        if (isAddModalOpen || isJsonModalOpen || isCloakModalOpen || isGoogleSitesModalOpen || isPhoneModalOpen) {
           setIsAddModalOpen(false);
           setIsJsonModalOpen(false);
           setIsCloakModalOpen(false);
           setIsGoogleSitesModalOpen(false);
+          setIsPhoneModalOpen(false);
           return;
         }
         setIsPanicActive(prev => !prev);
@@ -76,7 +79,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAddModalOpen, isJsonModalOpen, isCloakModalOpen, isGoogleSitesModalOpen]);
+  }, [isAddModalOpen, isJsonModalOpen, isCloakModalOpen, isGoogleSitesModalOpen, isPhoneModalOpen]);
 
   // Save favorites to localStorage
   const handleToggleFavorite = (id) => {
@@ -161,6 +164,7 @@ export default function App() {
         }}
         onOpenCloakModal={() => setIsCloakModalOpen(true)}
         onOpenGoogleSitesModal={() => setIsGoogleSitesModalOpen(true)}
+        onOpenPhoneModal={() => setIsPhoneModalOpen(true)}
         onTriggerPanic={() => setIsPanicActive(true)}
         favoritesCount={favorites.length}
         crtEnabled={crtEnabled}
@@ -312,6 +316,11 @@ export default function App() {
       <GoogleSitesEmbedModal
         isOpen={isGoogleSitesModalOpen}
         onClose={() => setIsGoogleSitesModalOpen(false)}
+      />
+
+      <PhoneGuideModal
+        isOpen={isPhoneModalOpen}
+        onClose={() => setIsPhoneModalOpen(false)}
       />
     </div>
   );

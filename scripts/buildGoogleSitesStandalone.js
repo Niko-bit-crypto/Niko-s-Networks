@@ -164,11 +164,50 @@ const html = `<!DOCTYPE html>
     .btn-cyan { background: #00f0ff; color: #000; }
     .btn-cyan:hover { background: #40f3ff; }
     .iframe-wrapper {
-      flex: 1; position: relative; width: 100%; height: 100%;
+      flex: 1; position: relative; width: 100%; height: 100%; min-height: 250px;
     }
     iframe {
       width: 100%; height: 100%; border: none; display: block;
     }
+    .touch-gamepad {
+      background: #140b28; border-top: 3px solid #000; padding: 8px 12px;
+      display: flex; align-items: center; justify-content: space-around;
+      user-select: none; touch-action: none; flex-shrink: 0; box-shadow: 0 -2px #ff007f;
+    }
+    .dpad-container { display: flex; align-items: center; justify-content: center; }
+    .dpad-cross {
+      position: relative; width: 110px; height: 110px; background: #0a0517;
+      border: 2px solid #000; border-radius: 50%;
+    }
+    .dpad-btn {
+      position: absolute; background: #251545; color: #00f0ff; border: 2px solid #000;
+      font-size: 14px; font-weight: bold; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; touch-action: none;
+    }
+    .dpad-btn:active { background: #00f0ff; color: #000; }
+    .dpad-up { top: 2px; left: 35px; width: 40px; height: 38px; }
+    .dpad-down { bottom: 2px; left: 35px; width: 40px; height: 38px; }
+    .dpad-left { left: 2px; top: 35px; width: 38px; height: 40px; }
+    .dpad-right { right: 2px; top: 35px; width: 38px; height: 40px; }
+    .dpad-center {
+      position: absolute; top: 38px; left: 38px; width: 34px; height: 34px;
+      background: #130728; border-radius: 50%; border: 2px solid #000;
+    }
+    .sys-container { display: flex; flex-direction: column; gap: 6px; }
+    .sys-btn { font-size: 10px; padding: 6px 10px; }
+    .btn-yellow { background: #ffe600; color: #000; }
+    .btn-yellow:hover { background: #ffea33; }
+    .action-container { display: flex; align-items: center; gap: 12px; }
+    .action-btn {
+      width: 54px; height: 54px; border-radius: 50%; border: 3px solid #000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; touch-action: none; box-shadow: 2px 2px #000;
+    }
+    .action-btn:active { transform: scale(0.95); }
+    .action-a { background: #ff007f; color: #fff; box-shadow: 0 0 10px rgba(255,0,127,0.5); }
+    .action-b { background: #00f0ff; color: #000; box-shadow: 0 0 10px rgba(0,240,255,0.4); }
+    .btn-letter { font-size: 16px; font-weight: bold; line-height: 1; }
+    .btn-label { font-size: 7px; font-weight: bold; text-transform: uppercase; line-height: 1; }
     footer {
       text-align: center; padding: 24px; font-size: 11px; color: #64748b;
     }
@@ -187,7 +226,10 @@ const html = `<!DOCTYPE html>
           <div class="logo-sub">UNBLOCKED 80'S RETRO ARCADE</div>
         </div>
       </div>
-      <input type="text" id="searchInput" class="search-input" placeholder="Search games...">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search games...">
+        <button class="btn btn-cyan" id="arcadeFullscreenBtn" style="padding:6px 10px;display:flex;align-items:center;gap:4px;">&#x2197; FULL TAB</button>
+      </div>
     </header>
 
     <div class="filters">
@@ -211,18 +253,45 @@ const html = `<!DOCTYPE html>
       <button class="btn" id="backBtn">&larr; BACK TO ARCADE</button>
       <span id="activeGameTitle" style="font-size: 13px; font-weight: bold; color: #ffe600;">PLAYING</span>
       <div style="display:flex;gap:6px;">
+        <button class="btn btn-yellow" id="toggleGamepadBtn">&#128241; PAD: ON</button>
         <button class="btn btn-green" id="restartBtn">&#8635; RESTART</button>
-        <button class="btn btn-cyan" id="fullscreenBtn">&#x26F6; FULLSCREEN</button>
+        <button class="btn btn-cyan" id="fullscreenBtn">&#x2197; FULL TAB</button>
       </div>
     </div>
     <div class="iframe-wrapper" id="frameWrapper">
       <iframe id="gameIframe" allow="autoplay; fullscreen; keyboard"></iframe>
     </div>
+    <!-- RETRO TOUCH GAMEPAD -->
+    <div id="touchGamepad" class="touch-gamepad">
+      <div class="dpad-container">
+        <div class="dpad-cross">
+          <button class="dpad-btn dpad-up" data-key="ArrowUp" data-code="ArrowUp">&#9650;</button>
+          <button class="dpad-btn dpad-left" data-key="ArrowLeft" data-code="ArrowLeft">&#9664;</button>
+          <button class="dpad-btn dpad-right" data-key="ArrowRight" data-code="ArrowRight">&#9654;</button>
+          <button class="dpad-btn dpad-down" data-key="ArrowDown" data-code="ArrowDown">&#9660;</button>
+          <div class="dpad-center"></div>
+        </div>
+      </div>
+      <div class="sys-container">
+        <button class="btn btn-yellow sys-btn" id="gpStartBtn">&#9658; START</button>
+        <button class="btn sys-btn" id="gpResetBtn">&#8635; RESET</button>
+      </div>
+      <div class="action-container">
+        <button class="action-btn action-b" id="gpBtnB" data-key="ArrowDown" data-code="ArrowDown">
+          <span class="btn-letter">B</span>
+          <span class="btn-label" id="gpLabelB">DUCK</span>
+        </button>
+        <button class="action-btn action-a" id="gpBtnA" data-key=" " data-code="Space">
+          <span class="btn-letter">A</span>
+          <span class="btn-label" id="gpLabelA">JUMP</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
     const GAMES_DATA = ${JSON.stringify(gamesListMeta)};
-    const GAMES_HTML = ${JSON.stringify(gamesObj)};
+    const GAMES_HTML = ${JSON.stringify(gamesObj).replace(/</g, '\\u003c')};
 
     let currentCat = 'ALL';
     let searchQuery = '';
@@ -238,6 +307,7 @@ const html = `<!DOCTYPE html>
     const backBtn = document.getElementById('backBtn');
     const restartBtn = document.getElementById('restartBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const arcadeFullscreenBtn = document.getElementById('arcadeFullscreenBtn');
 
     function renderGames() {
       grid.innerHTML = '';
@@ -274,9 +344,69 @@ const html = `<!DOCTYPE html>
       });
     }
 
+    function updateGamepadLabels(id) {
+      const btnA = document.getElementById('gpBtnA');
+      const btnB = document.getElementById('gpBtnB');
+      const labelA = document.getElementById('gpLabelA');
+      const labelB = document.getElementById('gpLabelB');
+      if (!btnA || !btnB) return;
+
+      if (id === 'tetris') {
+        btnA.dataset.key = 'ArrowUp'; btnA.dataset.code = 'ArrowUp'; labelA.textContent = 'ROTATE';
+        btnB.dataset.key = ' '; btnB.dataset.code = 'Space'; labelB.textContent = 'DROP';
+      } else if (id === 'flappy') {
+        btnA.dataset.key = ' '; btnA.dataset.code = 'Space'; labelA.textContent = 'FLAP';
+        btnB.dataset.key = 'Enter'; btnB.dataset.code = 'Enter'; labelB.textContent = 'START';
+      } else if (id === 'runner') {
+        btnA.dataset.key = ' '; btnA.dataset.code = 'Space'; labelA.textContent = 'JUMP';
+        btnB.dataset.key = 'ArrowDown'; btnB.dataset.code = 'ArrowDown'; labelB.textContent = 'DUCK';
+      } else if (id === 'space-invaders') {
+        btnA.dataset.key = ' '; btnA.dataset.code = 'Space'; labelA.textContent = 'FIRE';
+        btnB.dataset.key = 'Enter'; btnB.dataset.code = 'Enter'; labelB.textContent = 'START';
+      } else if (id === 'breakout' || id === 'pong') {
+        btnA.dataset.key = ' '; btnA.dataset.code = 'Space'; labelA.textContent = 'LAUNCH';
+        btnB.dataset.key = 'Enter'; btnB.dataset.code = 'Enter'; labelB.textContent = 'START';
+      } else {
+        btnA.dataset.key = ' '; btnA.dataset.code = 'Space'; labelA.textContent = 'ACTION';
+        btnB.dataset.key = 'Enter'; btnB.dataset.code = 'Enter'; labelB.textContent = 'START';
+      }
+    }
+
+    function sendKeyToGame(type, key, code) {
+      try {
+        const win = gameIframe.contentWindow;
+        if (win) {
+          const evt = new win.KeyboardEvent(type, { key: key, code: code || key, bubbles: true, cancelable: true });
+          win.dispatchEvent(evt);
+          if (win.document) win.document.dispatchEvent(evt);
+        }
+      } catch (err) {}
+      try {
+        gameIframe.contentWindow.postMessage({ type: 'arcade-key', action: type, key: key, code: code || key }, '*');
+      } catch (err) {}
+    }
+
+    // Key repeat handler for D-Pad
+    let keyIntervals = {};
+    function startKey(key, code) {
+      try { if (navigator.vibrate) navigator.vibrate(15); } catch (e) {}
+      sendKeyToGame('keydown', key, code);
+      if (!keyIntervals[key]) {
+        keyIntervals[key] = setInterval(() => sendKeyToGame('keydown', key, code), 75);
+      }
+    }
+    function stopKey(key, code) {
+      if (keyIntervals[key]) {
+        clearInterval(keyIntervals[key]);
+        delete keyIntervals[key];
+      }
+      sendKeyToGame('keyup', key, code);
+    }
+
     function openGame(id, title) {
       activeGameId = id;
       activeGameTitle.textContent = title.toUpperCase();
+      updateGamepadLabels(id);
       const htmlContent = GAMES_HTML[id];
       if (htmlContent) {
         gameIframe.srcdoc = htmlContent;
@@ -298,13 +428,41 @@ const html = `<!DOCTYPE html>
       }
     }
 
-    function toggleFullscreen() {
-      const el = document.getElementById('frameWrapper');
-      if (!document.fullscreenElement) {
-        if (el.requestFullscreen) el.requestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
+    function openFullTab() {
+      try {
+        const w = window.open('', '_blank');
+        if (w) {
+          w.document.open();
+          w.document.write('<!DOCTYPE html>' + document.documentElement.outerHTML);
+          w.document.close();
+          return;
+        }
+      } catch (err) {}
+      alert("Tip: In Google Sites, drag the blue corner handles on this embed box to make it fill your screen!");
+    }
+
+    function toggleFullscreen(targetEl) {
+      const el = targetEl || document.documentElement;
+      const canFullscreen = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+      
+      if (canFullscreen) {
+        try {
+          if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            let p = el.requestFullscreen ? el.requestFullscreen() : (el.webkitRequestFullscreen ? el.webkitRequestFullscreen() : null);
+            if (p && p.catch) {
+              p.catch(() => openFullTab());
+              return;
+            }
+          } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            return;
+          }
+        } catch (e) {
+          openFullTab();
+          return;
+        }
       }
+      openFullTab();
     }
 
     searchInput.addEventListener('input', e => {
@@ -323,7 +481,72 @@ const html = `<!DOCTYPE html>
 
     backBtn.addEventListener('click', closeGame);
     restartBtn.addEventListener('click', restartGame);
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
+    fullscreenBtn.addEventListener('click', () => toggleFullscreen(document.getElementById('frameWrapper')));
+    if (arcadeFullscreenBtn) {
+      arcadeFullscreenBtn.addEventListener('click', () => toggleFullscreen(document.documentElement));
+    }
+
+    // Touch Gamepad Event Listeners
+    const touchGamepad = document.getElementById('touchGamepad');
+    const toggleGamepadBtn = document.getElementById('toggleGamepadBtn');
+    let isGamepadVisible = true;
+
+    if (toggleGamepadBtn && touchGamepad) {
+      toggleGamepadBtn.addEventListener('click', () => {
+        isGamepadVisible = !isGamepadVisible;
+        touchGamepad.style.display = isGamepadVisible ? 'flex' : 'none';
+        toggleGamepadBtn.textContent = isGamepadVisible ? '📱 PAD: ON' : '📱 PAD: OFF';
+      });
+    }
+
+    // D-Pad buttons
+    document.querySelectorAll('.dpad-btn').forEach(btn => {
+      const key = btn.dataset.key;
+      const code = btn.dataset.code;
+      btn.addEventListener('pointerdown', e => { e.preventDefault(); startKey(key, code); });
+      btn.addEventListener('pointerup', e => { e.preventDefault(); stopKey(key, code); });
+      btn.addEventListener('pointerleave', e => { e.preventDefault(); stopKey(key, code); });
+      btn.addEventListener('pointercancel', e => { e.preventDefault(); stopKey(key, code); });
+    });
+
+    // Action buttons (A & B)
+    const btnA = document.getElementById('gpBtnA');
+    const btnB = document.getElementById('gpBtnB');
+    if (btnA) {
+      btnA.addEventListener('pointerdown', e => { e.preventDefault(); startKey(btnA.dataset.key, btnA.dataset.code); });
+      btnA.addEventListener('pointerup', e => { e.preventDefault(); stopKey(btnA.dataset.key, btnA.dataset.code); });
+      btnA.addEventListener('pointerleave', e => { e.preventDefault(); stopKey(btnA.dataset.key, btnA.dataset.code); });
+      btnA.addEventListener('pointercancel', e => { e.preventDefault(); stopKey(btnA.dataset.key, btnA.dataset.code); });
+    }
+    if (btnB) {
+      btnB.addEventListener('pointerdown', e => { e.preventDefault(); startKey(btnB.dataset.key, btnB.dataset.code); });
+      btnB.addEventListener('pointerup', e => { e.preventDefault(); stopKey(btnB.dataset.key, btnB.dataset.code); });
+      btnB.addEventListener('pointerleave', e => { e.preventDefault(); stopKey(btnB.dataset.key, btnB.dataset.code); });
+      btnB.addEventListener('pointercancel', e => { e.preventDefault(); stopKey(btnB.dataset.key, btnB.dataset.code); });
+    }
+
+    // System buttons
+    const gpStartBtn = document.getElementById('gpStartBtn');
+    const gpResetBtn = document.getElementById('gpResetBtn');
+    if (gpStartBtn) {
+      gpStartBtn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch (err) {}
+        sendKeyToGame('keydown', 'Enter', 'Enter');
+        sendKeyToGame('keydown', ' ', 'Space');
+      });
+      gpStartBtn.addEventListener('pointerup', e => {
+        e.preventDefault();
+        sendKeyToGame('keyup', 'Enter', 'Enter');
+        sendKeyToGame('keyup', ' ', 'Space');
+      });
+    }
+    if (gpResetBtn) {
+      gpResetBtn.addEventListener('click', () => {
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch (err) {}
+        restartGame();
+      });
+    }
 
     renderGames();
   </script>
@@ -333,6 +556,11 @@ const html = `<!DOCTYPE html>
 
 const destPath = path.resolve('public/google-sites-embed.html');
 fs.writeFileSync(destPath, html, 'utf8');
+
+const distDest = path.resolve('dist/google-sites-embed.html');
+if (fs.existsSync(path.resolve('dist'))) {
+  fs.writeFileSync(distDest, html, 'utf8');
+}
 
 const stats = fs.statSync(destPath);
 console.log(`Successfully built public/google-sites-embed.html! Size: ${(stats.size / 1024).toFixed(1)} KB`);

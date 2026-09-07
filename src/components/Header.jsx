@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Terminal, Shield, EyeOff, Sparkles, Tv, ShieldCheck } from 'lucide-react';
+import { Search, Plus, Terminal, Shield, EyeOff, Sparkles, Tv, ShieldCheck, Smartphone } from 'lucide-react';
 
 const CATEGORIES = [
   { label: 'All', color: 'border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(0,240,255,0.4)]', bgActive: 'bg-cyan-500 text-black shadow-[3px_3px_0px_#000]' },
@@ -19,6 +19,7 @@ export const Header = ({
   onOpenJsonModal,
   onOpenCloakModal,
   onOpenGoogleSitesModal,
+  onOpenPhoneModal,
   onTriggerPanic,
   favoritesCount,
   crtEnabled,
@@ -153,6 +154,17 @@ export const Header = ({
             >
               <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
               <span className="hidden sm:inline">G-SITES</span>
+            </button>
+
+            {/* Mobile / Phone Guide Button */}
+            <button
+              id="phone-guide-btn"
+              onClick={onOpenPhoneModal}
+              title="Play on phone / mobile touch controls guide"
+              className="arcade-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-arcade bg-[#ff007f] hover:bg-pink-400 text-white font-bold border-2 border-black pixel-shadow-black"
+            >
+              <Smartphone className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span className="hidden sm:inline">PHONE</span>
             </button>
 
             {/* Add Game */}
